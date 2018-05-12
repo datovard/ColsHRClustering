@@ -39,6 +39,15 @@ ES AFILIADO A PAC O TIENE AFILIADO A UN FAMILIAR
 CATEGORIA ESPECIFICA
 CATEGORIA
 """
+
+class Discretize:
+
+    def __init__(self, csv_route, dataset):
+        self.file = csv_route
+        self.dataset = dataset
+
+    def
+
 plt.interactive(False)
 
 dataset = pd.read_csv('files/database.csv', index_col=False, header=0, delimiter="\t");

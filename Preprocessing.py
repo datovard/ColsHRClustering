@@ -2,12 +2,10 @@ import pandas as pd
 from datetime import datetime
 
 class Preprocess:
-    def __init__(self, csv_route, dataset):
-        self.file = csv_route
+    def __init__(self, dataset):
         self.dataset = dataset
 
     def preprocessFile(self):
-        self.dataset = pd.read_csv( self.file, index_col=False, header=0, delimiter="\t");
 
         self.dataset['SALARIOS MINIMOS'] = pd.Series()
         self.dataset['SALARIOS MINIMOS'] = self.dataset['SALARIO A 240']/(737717)
