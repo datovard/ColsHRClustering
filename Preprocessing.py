@@ -1,67 +1,25 @@
-#########################
-# Column id's
-#
-# 0  - ID
-# 1  - CARGO
-# 2  - FECHA INICIO POSESION
-# 3  - FIN
-# 4  - TURNO
-# 5  - SUELDO TEXTO
-# 6  - SALARIO
-# 7  - HORAS AL MES
-# 8  - HORAS SEMANALES
-# 9  - HORAS DIARIAS
-# 10 - HORARIO TRABAJO
-# 11 - GRUPO PERSONAL
-# 12 - CLASE DE CONTRATO
-# 13 - RELACION LABORAL
-# 14 - TIPO DE PACTO
-# 15 - PRIMERA ALTA
-# 16 - FECHA EXPIRACION CONTRATO
-# 17 - AREA DE NOMINA
-# 18 - CENTRO DE COSTE
-# 19 - DIVISION
-# 20 - DIVISION PERSONAL
-# 21 - SUBDIVISION PERSONAL
-# 22 - AREA DE PERSONAL
-# 23 - SEXO
-# 24 - EDAD DEL EMPLEADO
-# 25 - FECHA DE NACIMIENTO
-# 26 - ROL DEL EMPLEADO
-# 27 - SALARIO A 240
-# 28 - TIPO DE PACTO
-# 29 - AFILIADO A PAC
-# 30 - FAMILIAR AFILIADO A PAC
-# 31 - ES AFILIADO A PAC O TIENE AFILIADO A UN FAMILIAR
-# 32 - CATEGORIA ESPECIFICA
-# 33 - CATEGORIA
-#########################
-
-import numpy as np
 import pandas as pd
+from datetime import datetime
 
-dataset = pd.read_csv('files/database.csv', index_col=False, header=0, delimiter="\t");
+class Preprocess:
+    def __init__(self, csv_route, dataset):
+        self.file = csv_route
+        self.dataset = dataset
 
-print dataset.keys()
-print dataset['SALARIO A 240']
+    def preprocessFile(self):
+        self.dataset = pd.read_csv( self.file, index_col=False, header=0, delimiter="\t");
 
-"""
-dataset['SALARIO'] = map( lambda x: str.replace( x, ',', '' ), dataset['SALARIO'] )
-dataset['SALARIO'] = map( int, dataset['SALARIO'] )
+        self.dataset['SALARIOS MINIMOS'] = pd.Series()
+        self.dataset['SALARIOS MINIMOS'] = self.dataset['SALARIO A 240']/(737717)
 
-dataset['SALARIO A 240'] = map( lambda x: str.replace( x, ',', '' ), dataset['SALARIO A 240'] )
-dataset['SALARIO A 240'] = map( int, dataset['SALARIO A 240'] )
+        self.dataset['FECHA INICIO POSESION'] = map( lambda x: datetime.strptime( x, '%d/%m/%Y' ) if x != "00/00/0000" else None, self.dataset['FECHA INICIO POSESION'] )
+        self.dataset['FIN'] = map( lambda x: datetime.strptime( x, '%d.%m.%Y' ) if x != "31.12.9999" and x != "00.00.0000" else None, self.dataset['FIN'] )
+        self.dataset['PRIMERA ALTA'] = map( lambda x: datetime.strptime( x, '%d.%m.%Y' ) if x != "31.12.9999" and x != "00.00.0000" else None, self.dataset['PRIMERA ALTA'] )
+        self.dataset['FECHA EXPIRACION CONTRATO'] = map( lambda x: datetime.strptime( x, '%d.%m.%Y' ) if x != "31.12.9999" and x != "00.00.0000" else None, self.dataset['FECHA EXPIRACION CONTRATO'] )
 
-dataset['SALARIOS MINIMOS'] = pd.Series()
-dataset['SALARIOS MINIMOS'] = dataset['SALARIO A 240']/(737717)
+        del self.dataset['ID']
+        del self.dataset['FECHA DE NACIMIENTO']
 
-del dataset['ID']
+        self.dataset = self.dataset.drop( self.dataset[self.dataset["EDAD DEL EMPLEADO"] > 70].index )
 
-np_array = dataset.values
-names = list(dataset.dtypes.keys())
-record = np_array[0]
-
-for i in xrange( len( names ) ):
-    print names[i]+":", record[i], type(record[i])
-
-"""
+        return self.dataset
