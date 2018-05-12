@@ -1,4 +1,3 @@
-import numpy as np
 import pandas as pd
 from datetime import datetime
 
@@ -20,5 +19,7 @@ class Preprocess:
 
         del self.dataset['ID']
         del self.dataset['FECHA DE NACIMIENTO']
+
+        self.dataset = self.dataset.drop( self.dataset[self.dataset["EDAD DEL EMPLEADO"] > 70].index )
 
         return self.dataset
