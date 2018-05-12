@@ -40,7 +40,7 @@
 import numpy as np
 import pandas as pd
 
-dataset = pd.read_csv('C:/Users/abad_/Documents/database.csv', index_col=False, header=0, delimiter=";");
+dataset = pd.read_csv('files/database.csv', index_col=False, header=0, delimiter=";");
 
 dataset['SALARIO'] = map( lambda x: str.replace( x, ',', '' ), dataset['SALARIO'] )
 dataset['SALARIO'] = map( int, dataset['SALARIO'] )
