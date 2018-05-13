@@ -7,6 +7,8 @@ class Preprocess:
 
     def preprocessFile(self):
 
+        print "PREPROCESSING MODULE"
+
         self.dataset['SALARIOS MINIMOS'] = pd.Series()
         self.dataset['SALARIOS MINIMOS'] = self.dataset['SALARIO A 240']/(737717)
 
