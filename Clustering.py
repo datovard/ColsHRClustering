@@ -1,36 +1,75 @@
-# Code source: Gael Varoquaux
-# Modified for documentation by Jaques Grobler
-# License: BSD 3 clause
-
 import numpy as np
 import matplotlib.pyplot as plt
-# Though the following import is not directly being used, it is required
-# for 3D projection to work
 from mpl_toolkits.mplot3d import Axes3D
 
 from sklearn.cluster import KMeans
-from sklearn import datasets
-
-np.random.seed(5)
+from sklearn.metrics import silhouette_score
+from scipy.spatial.distance import pdist, euclidean
 
 class Cluster:
     def __init__(self, dataset):
         self.dataset = dataset
+        self.maxK = 10
 
     def startClustering(self):
+        categorias = self.dataset['CATEGORIA'].astype("category").cat.codes.values
+        self.dataset.drop(['CATEGORIA'], axis=1, inplace=True)
+
+        self.fignum = 1
+
         keys = list(self.dataset)
         X = self.dataset.values
-        kmeans = KMeans(n_clusters=3)
-        kmeans.fit(X)
-        labels = kmeans.predict(X)
-        centers = kmeans.cluster_centers_
 
-        self.plotCluster( X, labels, centers, keys )
+        clusters = []
 
-    def plotCluster(self, data, labels, centers, keys):
-        fignum = 1
+        for i in xrange( 3, self.maxK + 1 ):
+            clusters.append( (i, KMeans(n_clusters=i)) )
 
-        fig = plt.figure(fignum, figsize=(4, 3))
+        print "IMPRIMIENDO CLASIFICACION CORRECTA"
+        self.plotCluster( X, categorias, [0,0,0,0], keys, "Clasificacion original" )
+        print "LISTO"
+
+        print "CALCULANDO EJECUCIONES K MEANS"
+        errors = []
+        dbindexes = []
+        for i, kmeans in clusters:
+            print "CALCULANDO K =", i
+            kmeans.fit(X)
+            labels = kmeans.predict(X)
+            centers = kmeans.cluster_centers_
+
+            print "\tError cuadratico:", kmeans.inertia_
+            errors.append( kmeans.inertia_ )
+            dbIndex = self.daviesbouldin(X, labels, centers)
+            print "\tIndice Davies-Bouldin:", dbIndex
+
+            dbindexes.append(dbIndex)
+
+            #self.plotCluster( X, labels, centers, keys, "# Clusters: " + str(len(centers)) )
+        print "LISTO"
+
+        print "GRAFICANDO ERROR CUADRATICO"
+        k_X = np.array( xrange(3, self.maxK+1 ) )
+        sse_Y = np.array( errors )
+        db_Y = np.array(dbindexes)
+
+
+        plt.plot(k_X, sse_Y, '-o')
+        plt.xlabel("# de clusters (k)")
+        plt.ylabel("Suma de distancias cuadradas")
+        plt.show()
+        plt.plot(k_X, db_Y, '-o')
+        plt.xlabel("# de clusters (k)")
+        plt.ylabel("Indice Davies-Bouldin")
+        plt.show()
+        print "LISTO"
+
+    '''def sumOfSquaredWithin(self, X, labels, centroids):
+        for row in X:'''
+
+
+    def plotCluster(self, data, labels, centers, keys, title):
+        fig = plt.figure(self.fignum, figsize=(4, 3))
         ax = Axes3D(fig, rect=[0, 0, .95, 1], elev=48, azim=134)
 
         ax.scatter(data[:, 0], data[:, 1], data[:, 2],
@@ -42,70 +81,38 @@ class Cluster:
         ax.set_xlabel(keys[0])
         ax.set_ylabel(keys[1])
         ax.set_zlabel(keys[2])
-        ax.set_title("# Clusters: " + str(len(centers)))
+        ax.set_title(title)
         ax.dist = 12
 
+        self.fignum += 1
         fig.show()
 
+    def daviesbouldin( self, X, labels, centroids ):
+        nbre_of_clusters = len(centroids)  # Get the number of clusters
+        distances = [[] for e in range(nbre_of_clusters)]  # Store intra-cluster distances by cluster
+        distances_means = []  # Store the mean of these distances
+        DB_indexes = []  # Store Davies_Boulin index of each pair of cluster
+        second_cluster_idx = []  # Store index of the second cluster of each pair
+        first_cluster_idx = 0  # Set index of first cluster of each pair to 0
 
+        # Step 1: Compute euclidean distances between each point of a cluster to their centroid
+        for cluster in range(nbre_of_clusters):
+            for point in range(X[labels == cluster].shape[0]):
+                distances[cluster].append(euclidean(X[labels == cluster][point], centroids[cluster]))
 
-'''
-iris = datasets.load_iris()
-X = iris.data
-y = iris.target
-print X
-print y
+        # Step 2: Compute the mean of these distances
+        for e in distances:
+            distances_means.append(np.mean(e))
 
-estimators = [('k_means_iris_8', KMeans(n_clusters=8)),
-              ('k_means_iris_3', KMeans(n_clusters=3)),
-              ('k_means_iris_bad_init', KMeans(n_clusters=3, n_init=1,
-                                               init='random'))]
+        # Step 3: Compute euclidean distances between each pair of centroid
+        ctrds_distance = pdist(centroids)
 
-fignum = 1
-titles = ['8 clusters', '3 clusters', '3 clusters, bad initialization']
-for name, est in estimators:
-    fig = plt.figure(fignum, figsize=(4, 3))
-    ax = Axes3D(fig, rect=[0, 0, .95, 1], elev=48, azim=134)
-    est.fit(X)
-    labels = est.labels_
+        # Tricky step 4: Compute Davies-Bouldin index of each pair of cluster
+        for i, e in enumerate(e for start in range(1, nbre_of_clusters) for e in range(start, nbre_of_clusters)):
+            second_cluster_idx.append(e)
+            if second_cluster_idx[i - 1] == nbre_of_clusters - 1:
+                first_cluster_idx += 1
+            DB_indexes.append((distances_means[first_cluster_idx] + distances_means[e]) / ctrds_distance[i])
 
-    ax.scatter(X[:, 3], X[:, 0], X[:, 2],
-               c=labels.astype(np.float), edgecolor='k')
-
-    ax.w_xaxis.set_ticklabels([])
-    ax.w_yaxis.set_ticklabels([])
-    ax.w_zaxis.set_ticklabels([])
-    ax.set_xlabel('Petal width')
-    ax.set_ylabel('Sepal length')
-    ax.set_zlabel('Petal length')
-    ax.set_title(titles[fignum - 1])
-    ax.dist = 12
-    fignum = fignum + 1
-
-# Plot the ground truth
-fig = plt.figure(fignum, figsize=(4, 3))
-ax = Axes3D(fig, rect=[0, 0, .95, 1], elev=48, azim=134)
-
-for name, label in [('Setosa', 0),
-                    ('Versicolour', 1),
-                    ('Virginica', 2)]:
-    ax.text3D(X[y == label, 3].mean(),
-              X[y == label, 0].mean(),
-              X[y == label, 2].mean() + 2, name,
-              horizontalalignment='center',
-              bbox=dict(alpha=.2, edgecolor='w', facecolor='w'))
-# Reorder the labels to have colors matching the cluster results
-y = np.choose(y, [1, 2, 0]).astype(np.float)
-ax.scatter(X[:, 3], X[:, 0], X[:, 2], c=y, edgecolor='k')
-
-ax.w_xaxis.set_ticklabels([])
-ax.w_yaxis.set_ticklabels([])
-ax.w_zaxis.set_ticklabels([])
-ax.set_xlabel('Petal width')
-ax.set_ylabel('Sepal length')
-ax.set_zlabel('Petal length')
-ax.set_title('Ground Truth')
-ax.dist = 12
-
-fig.show()
-'''
+        # Step 5: Compute the mean of all DB_indexes
+        return np.mean(DB_indexes)

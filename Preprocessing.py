@@ -28,7 +28,7 @@ class Preprocess:
                       'ES AFILIADO A PAC O TIENE AFILIADO A UN FAMILIAR', 'CATEGORIA ESPECIFICA']
         self.dataset.drop( erase_vars, axis=1, inplace=True )
 
-        self.dataset = self.dataset[['SALARIOS MINIMOS', 'EDAD DEL EMPLEADO', 'AFILIADO A PAC']] #, 'CATEGORIA']]
+        self.dataset = self.dataset[['SALARIOS MINIMOS', 'EDAD DEL EMPLEADO', 'AFILIADO A PAC', 'CATEGORIA']]
 
         self.dataset = self.dataset.drop( self.dataset[self.dataset["EDAD DEL EMPLEADO"] > 70].index )
 

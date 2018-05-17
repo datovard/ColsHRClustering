@@ -58,7 +58,6 @@ class Discretize:
         bins = 8
         age = self.dataset["EDAD DEL EMPLEADO"]
         age = pd.cut(age, bins)
-        print age.values.value_counts()
         grap = age.values.value_counts()
         grap.plot(kind='bar')
         plt.show()
