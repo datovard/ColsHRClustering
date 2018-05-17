@@ -45,7 +45,8 @@ class Cluster:
 
             dbindexes.append(dbIndex)
 
-            #self.plotCluster( X, labels, centers, keys, "# Clusters: " + str(len(centers)) )
+            self.plotCluster( X, labels, centers, keys, "# Clusters: " + str(len(centers)) )
+
         print "LISTO"
 
         print "GRAFICANDO ERROR CUADRATICO"
@@ -63,10 +64,6 @@ class Cluster:
         plt.ylabel("Indice Davies-Bouldin")
         plt.show()
         print "LISTO"
-
-    '''def sumOfSquaredWithin(self, X, labels, centroids):
-        for row in X:'''
-
 
     def plotCluster(self, data, labels, centers, keys, title):
         fig = plt.figure(self.fignum, figsize=(4, 3))
