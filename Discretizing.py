@@ -49,15 +49,10 @@ class Discretize:
 
         plt.interactive(False)
 
-        print self.dataset["EDAD DEL EMPLEADO"]
-
         #self.dataset = pd.read_csv('files/database.csv', index_col=False, header=0, delimiter="\t");
         for r in self.dataset[self.dataset["EDAD DEL EMPLEADO"] > 70].index:
             print self.dataset.loc[r], "\n-------------------------------------------------------------------------------------------"
         self.dataset = self.dataset.drop(self.dataset[self.dataset["EDAD DEL EMPLEADO"] > 70].index)
-
-
-        print self.dataset
 
         #DISCRETIZE AGE
         bins = 8

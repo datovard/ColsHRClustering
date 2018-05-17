@@ -1,6 +1,7 @@
 import pandas as pd
 from Preprocessing import Preprocess
 from Discretizing import Discretize
+from Clustering import Cluster
 
 class Main:
 
@@ -17,6 +18,10 @@ class Main:
         #Discretize
         discretize = Discretize( self.dataset )
         self.dataset = discretize.discretizeFile()
+
+        #Cluster
+        cluster = Cluster( self.dataset )
+        cluster.startClustering()
 
         """
         np_array = self.dataset.values

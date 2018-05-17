@@ -17,8 +17,18 @@ class Preprocess:
         self.dataset['PRIMERA ALTA'] = map( lambda x: datetime.strptime( x, '%d.%m.%Y' ) if x != "31.12.9999" and x != "00.00.0000" else None, self.dataset['PRIMERA ALTA'] )
         self.dataset['FECHA EXPIRACION CONTRATO'] = map( lambda x: datetime.strptime( x, '%d.%m.%Y' ) if x != "31.12.9999" and x != "00.00.0000" else None, self.dataset['FECHA EXPIRACION CONTRATO'] )
 
-        erase_vars = ['ID', 'FECHA DE NACIMIENTO']
+
+        #erase_vars = ['ID', 'FECHA DE NACIMIENTO', 'CARGO', 'FECHA INICIO POSESION', 'FIN', 'TURNO', 'SUELDO TEXTO', 'SALARIO', 'HORAS AL MES', 'HORAS SEMANALES', 'HORAS DIARIAS', 'HORARIO TRABAJO', 'GRUPO PERSONAL', 'CLASE DE CONTRATO', 'RELACION LABORAL', 'TIPO DE PACTO', 'PRIMERA ALTA', 'FECHA EXPIRACION CONTRATO', 'AREA DE NOMINA', 'CENTRO DE COSTE', 'DIVISION', 'DIVISION PERSONAL', 'SUBDIVISION PERSONAL', 'AREA DE PERSONAL', 'SEXO', 'EDAD DEL EMPLEADO', 'ROL DEL EMPLEADO', 'SALARIO A 240', 'TIPO DE PACTO ESPECIFICO', 'AFILIADO A PAC', 'FAMILIAR AFILIADO A PAC', 'ES AFILIADO A PAC O TIENE AFILIADO A UN FAMILIAR', 'CATEGORIA ESPECIFICA', 'CATEGORIA', 'SALARIOS MINIMOS']
+        erase_vars = ['ID', 'FECHA DE NACIMIENTO', 'CARGO', 'FECHA INICIO POSESION', 'FIN', 'TURNO', 'SUELDO TEXTO',
+                      'SALARIO', 'HORAS AL MES', 'HORAS SEMANALES', 'HORAS DIARIAS', 'HORARIO TRABAJO',
+                      'GRUPO PERSONAL', 'CLASE DE CONTRATO', 'RELACION LABORAL', 'TIPO DE PACTO', 'PRIMERA ALTA',
+                      'FECHA EXPIRACION CONTRATO', 'AREA DE NOMINA', 'CENTRO DE COSTE', 'DIVISION', 'DIVISION PERSONAL',
+                      'SUBDIVISION PERSONAL', 'AREA DE PERSONAL', 'SEXO', 'ROL DEL EMPLEADO',
+                      'SALARIO A 240', 'TIPO DE PACTO ESPECIFICO', 'FAMILIAR AFILIADO A PAC',
+                      'ES AFILIADO A PAC O TIENE AFILIADO A UN FAMILIAR', 'CATEGORIA ESPECIFICA']
         self.dataset.drop( erase_vars, axis=1, inplace=True )
+
+        self.dataset = self.dataset[['SALARIOS MINIMOS', 'EDAD DEL EMPLEADO', 'AFILIADO A PAC']] #, 'CATEGORIA']]
 
         self.dataset = self.dataset.drop( self.dataset[self.dataset["EDAD DEL EMPLEADO"] > 70].index )
 
