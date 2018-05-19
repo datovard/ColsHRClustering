@@ -44,23 +44,42 @@ class Discretize:
 
     def __init__(self, dataset):
         self.dataset = dataset
+        plt.interactive(False)
 
     def discretizeFile(self):
 
-        plt.interactive(False)
+        print "DISCRETIZE MODULE"
 
-        #self.dataset = pd.read_csv('files/database.csv', index_col=False, header=0, delimiter="\t");
-        for r in self.dataset[self.dataset["EDAD DEL EMPLEADO"] > 70].index:
-            print self.dataset.loc[r], "\n-------------------------------------------------------------------------------------------"
-        self.dataset = self.dataset.drop(self.dataset[self.dataset["EDAD DEL EMPLEADO"] > 70].index)
+        data = self.dataset
 
-        #DISCRETIZE AGE
+        """
+        #Discretize Age
         bins = 8
-        age = self.dataset["EDAD DEL EMPLEADO"]
-        age = pd.cut(age, bins)
-        grap = age.values.value_counts()
-        grap.plot(kind='bar')
+        data["EDAD DEL EMPLEADO"] = pd.cut(data["EDAD DEL EMPLEADO"], bins)
+        print data["EDAD DEL EMPLEADO"].values.value_counts()
+        data["EDAD DEL EMPLEADO"].values.value_counts().plot(kind='bar')
+        plt.show()
+        """
+
+        print len(data)
+
+        #Discretize Salary
+        bins = 6
+        print max(data["SALARIO A 240"])
+        range1 = data[data["SALARIO A 240"] > 0][data["SALARIO A 240"] <= 8714792]
+        range2 = data[data["SALARIO A 240"] > 8714792][data["SALARIO A 240"] <= 21757176]
+
+        range1["SALARIO A 240"] = pd.cut(range1["SALARIO A 240"], 8, labels=["a","b","c","d","e","f","g","h"])
+        range2["SALARIO A 240"] = pd.cut(range2["SALARIO A 240"], 3, labels=["i","j","k"])
+
+        #range1["SALARIO A 240"].value_counts().plot(kind='bar')
+        #range2["SALARIO A 240"].value_counts().plot(kind='bar')
+
+        merged = pd.concat([range1, range2])
+        print merged["SALARIO A 240"].value_counts().sort_index()
+        merged["SALARIO A 240"].value_counts().sort_index().plot(kind='bar')
         plt.show()
 
+        #Renew dataset and return it
+        self.dataset = data
         return self.dataset
-
