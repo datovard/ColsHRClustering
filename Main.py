@@ -11,22 +11,23 @@ class Main:
         self.start()
 
     def start(self):
-
         #Preprocessing
         preprocess = Preprocess( self.dataset )
         self.dataset = preprocess.preprocessFile()
 
         #Discretize
-        discretize = Discretize( self.dataset, False )
+        discretize = Discretize( self.dataset, True )
         self.dataset = discretize.discretizeFile()
 
+        print self.dataset
+
         #PCA
-        pca = Pca( self.dataset )
-        pca.pca_process()
+        # pca = Pca( self.dataset )
+        # pca.pca_process()
 
         #Cluster
-        #cluster = Cluster( self.dataset )
-        #cluster.startClusteringKMeans()
+        # cluster = Cluster( self.dataset )
+        # cluster.startClusteringKMeans()
         # cluster.startClusteringKPrototypesFullData()
         # cluster.startClusteringKPrototypesMinData()
 
