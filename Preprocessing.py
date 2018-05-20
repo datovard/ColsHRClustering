@@ -15,7 +15,7 @@ class Preprocess:
 
         #Missing data in FECHA INICIO POSESION
         mean = datetime.strptime("2005-01-18", '%Y-%m-%d')
-        self.dataset['FECHA INICIO POSESION'] = map(lambda x: datetime.strptime(x, '%d/%m/%Y') if x != "00/00/0000" else mean, self.dataset['FECHA INICIO POSESION'])
+        self.dataset['FECHA INICIO POSESION'] = map(lambda x: datetime.strptime(x, '%d/%m/%Y') if x != "00/00/0000" and x != "1/01/1960" else mean, self.dataset['FECHA INICIO POSESION'])
 
         mean = datetime.strptime("1732-03-18", '%Y-%m-%d')
         self.dataset['FIN'] = map(lambda x: datetime.strptime( x, '%d.%m.%Y' ) if x != "31.12.9999" and x != "00.00.0000" else mean, self.dataset['FIN'])

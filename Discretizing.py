@@ -48,7 +48,8 @@ class Discretize:
         self.flag = flag
         plt.interactive(False)
 
-    def savePlot(self, filename):
+    def savePlot(self, filename, scale):
+        plt.tight_layout()
         plt.savefig(filename)
         plt.clf()
 
@@ -65,7 +66,7 @@ class Discretize:
         column = pd.cut(column, bins)
 
         column.values.value_counts().plot(kind='bar', title="EDAD DEL EMPLEADO")
-        if self.flag: self.savePlot( folder + "EDAD DEL EMPLEADO.png" )
+        if self.flag: self.savePlot( folder + "EDAD DEL EMPLEADO.png", None )
         data["EDAD DEL EMPLEADO"] = column
 
         #Discretize Salary
@@ -81,17 +82,17 @@ class Discretize:
 
         merged["SALARIO A 240"].value_counts().sort_index().plot(kind='bar', title="SALARIO A 240")
         data["SALARIO A 240"] = merged["SALARIO A 240"]
-        if self.flag: self.savePlot( folder + "SALARIO A 240.png" )
+        if self.flag: self.savePlot( folder + "SALARIO A 240.png", None )
 
         # Discretize Initial Date
         column = data["FECHA INICIO POSESION"]
-        bins_dt = pd.date_range('2006-01-01', freq='1AS', periods=9)
+        bins_dt = pd.date_range('2005-01-01', freq='1AS', periods=15)
         bins_str = bins_dt.astype(str).values
         labels = ['({}, {}]'.format(bins_str[i - 1], bins_str[i]) for i in range(1, len(bins_str))]
         column = pd.cut(column.astype(np.int64)//10**9,bins=bins_dt.astype(np.int64)//10**9,labels=labels)
 
-        column.values.value_counts().plot(kind='bar', title="FECHA INICIO POSESION")
-        if self.flag: self.savePlot(folder + "FECHA INICIO POSESION.png")
+        column.values.value_counts().plot(kind='bar', title="FECHA INICIO POSESION",figsize=(8,6))
+        if self.flag: self.savePlot(folder + "FECHA INICIO POSESION.png", 0.4)
         data["FECHA INICIO POSESION"] = column
 
         # Discretize Primera Alta
@@ -103,7 +104,7 @@ class Discretize:
         column = pd.cut(column.astype(np.int64) // 10 ** 9, bins=bins_dt.astype(np.int64) // 10 ** 9, labels=labels)
 
         column.values.value_counts().plot(kind='bar', title="PRIMERA ALTA")
-        if self.flag: self.savePlot(folder + "PRIMERA ALTA.png")
+        if self.flag: self.savePlot(folder + "PRIMERA ALTA.png", None)
         data["PRIMERA ALTA"] = column
 
         # Discretize Horas al mes
@@ -112,7 +113,7 @@ class Discretize:
         column = pd.cut(column, bins)
 
         column.values.value_counts().plot(kind='bar', title='HORAS AL MES')
-        if self.flag: self.savePlot(folder + "HORAS AL MES.png")
+        if self.flag: self.savePlot(folder + "HORAS AL MES.png", None)
         data['HORAS AL MES'] = column
 
         # Salarios Minimos
@@ -121,7 +122,7 @@ class Discretize:
         column = pd.cut(column, bins)
 
         column.values.value_counts().plot(kind='bar', title="SALARIOS MINIMOS")
-        if self.flag: self.savePlot(folder + "SALARIOS MINIMOS.png")
+        if self.flag: self.savePlot(folder + "SALARIOS MINIMOS.png", None)
         data["SALARIOS MINIMOS"] = column
 
         # Discretize ES AFILIADO A PAC O TIENE AFILIADO A UN FAMILIAR
@@ -130,7 +131,7 @@ class Discretize:
         column = pd.cut(column, bins, labels=["0", "1", "2", "3", "4", "5", "6"])
 
         column.values.value_counts().plot(kind='bar', title="ES AFILIADO A PAC O TIENE AFILIADO A UN FAMILIAR")
-        if self.flag: self.savePlot(folder + "ES AFILIADO A PAC O TIENE AFILIADO A UN FAMILIAR.png")
+        if self.flag: self.savePlot(folder + "ES AFILIADO A PAC O TIENE AFILIADO A UN FAMILIAR.png", None)
         data["ES AFILIADO A PAC O TIENE AFILIADO A UN FAMILIAR"] = column
 
         # Discretize AFILIADO A PAC
@@ -140,7 +141,7 @@ class Discretize:
         column = pd.cut(column, bins, labels=["0", "1"])
 
         column.values.value_counts().plot(kind='bar', title="AFILIADO A PAC")
-        if self.flag: self.savePlot(folder + "AFILIADO A PAC.png")
+        if self.flag: self.savePlot(folder + "AFILIADO A PAC.png", None)
         data["AFILIADO A PAC"] = column
 
         # Discretize AFILIADO A PAC
@@ -150,7 +151,7 @@ class Discretize:
         column = pd.cut(column, bins, labels=["0", "1", "2", "3", "4", "5"])
 
         column.values.value_counts().plot(kind='bar', title="FAMILIAR AFILIADO A PAC")
-        if self.flag: self.savePlot(folder + "FAMILIAR AFILIADO A PAC.png")
+        if self.flag: self.savePlot(folder + "FAMILIAR AFILIADO A PAC.png", None)
         data["FAMILIAR AFILIADO A PAC"] = column
         #print data
 

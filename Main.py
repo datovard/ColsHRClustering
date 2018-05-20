@@ -19,8 +19,6 @@ class Main:
         discretize = Discretize( self.dataset, True )
         self.dataset = discretize.discretizeFile()
 
-        print self.dataset
-
         #PCA
         # pca = Pca( self.dataset )
         # pca.pca_process()
