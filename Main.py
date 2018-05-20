@@ -17,21 +17,13 @@ class Main:
 
         #Discretize
         discretize = Discretize( self.dataset )
-        self.dataset = discretize.discretizeFile()
+        # self.dataset = discretize.discretizeFile()
 
         #Cluster
         cluster = Cluster( self.dataset )
-        cluster.startClustering()
-
-        """
-        np_array = self.dataset.values
-        names = list( self.dataset.dtypes.keys())
-        record = np_array[0]
-
-        for i in xrange(len(names)):
-            print names[i] + ":", record[i], type(record[i])
-        """
-
+        cluster.startClusteringKMeans()
+        # cluster.startClusteringKPrototypesFullData()
+        # cluster.startClusteringKPrototypesMinData()
 
 file = 'files/database.csv'
 

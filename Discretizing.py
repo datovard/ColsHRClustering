@@ -60,7 +60,7 @@ class Discretize:
         age = pd.cut(age, bins)
         grap = age.values.value_counts()
         grap.plot(kind='bar')
-        plt.show()
+        #plt.show()
 
         return self.dataset
 
