@@ -25,8 +25,8 @@ class Main:
         pca.pca_process()
 
         #Cluster
-        cluster = Cluster( self.dataset )
-        cluster.startClusteringKMeans()
+        #cluster = Cluster( self.dataset )
+        #cluster.startClusteringKMeans()
         # cluster.startClusteringKPrototypesFullData()
         # cluster.startClusteringKPrototypesMinData()
 

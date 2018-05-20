@@ -4,7 +4,7 @@ from mpl_toolkits.mplot3d import Axes3D
 
 from sklearn.cluster import KMeans
 from scipy.spatial.distance import pdist, euclidean
-from kmodes.kprototypes import KPrototypes
+#from kmodes.kprototypes import KPrototypes
 
 class Cluster:
     def __init__(self, dataset):

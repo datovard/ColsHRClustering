@@ -69,8 +69,8 @@ class Discretize:
         range1 = data[data["SALARIO A 240"] > 0][data["SALARIO A 240"] <= 8714792]
         range2 = data[data["SALARIO A 240"] > 8714792][data["SALARIO A 240"] <= 21757176]
 
-        range1["SALARIO A 240"] = pd.cut(range1["SALARIO A 240"], 8, labels=["a","b","c","d","e","f","g","h"])
-        range2["SALARIO A 240"] = pd.cut(range2["SALARIO A 240"], 3, labels=["i","j","k"])
+        range1["SALARIO A 240"] = pd.cut(range1["SALARIO A 240"], 8, labels=["A:(13019.37, 876198.75]","B:(876198.75, 1732527.5]","C:(1732527.5, 2588856.25]","D:(2588856.25, 3445185]","E:(3445185, 4301513.75]","F:(4301513.75, 5157842.5]","G:(5157842.5, 6014171.25]","H:(6014171.25, 6870500]"])
+        range2["SALARIO A 240"] = pd.cut(range2["SALARIO A 240"], 3, labels=["H:(9578233.224, 13645992]","I:(13645992, 17701584]","J:(17701584, 21757176]"])
 
         #range1["SALARIO A 240"].value_counts().plot(kind='bar')
         #range2["SALARIO A 240"].value_counts().plot(kind='bar')
