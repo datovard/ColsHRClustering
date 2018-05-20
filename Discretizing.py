@@ -43,8 +43,9 @@ CATEGORIA
 
 class Discretize:
 
-    def __init__(self, dataset):
+    def __init__(self, dataset, flag):
         self.dataset = dataset
+        self.flag = flag
         plt.interactive(False)
 
     def discretizeFile(self):
@@ -52,9 +53,6 @@ class Discretize:
         data = self.dataset
 
         print "DISCRETIZE MODULE"
-        print data.dtypes
-        #print data.head()
-        #print data.keys()
 
         #Discretize Age
         bins = 8
@@ -62,7 +60,7 @@ class Discretize:
         column = pd.cut(column, bins)
         print column.values.value_counts()
         column.values.value_counts().plot(kind='bar', title="EDAD DEL EMPLEADO")
-        plt.show()
+        if self.flag: plt.show()
         data["EDAD DEL EMPLEADO"] = column
 
         #Discretize Salary
@@ -81,7 +79,7 @@ class Discretize:
         print merged["SALARIO A 240"].value_counts().sort_index()
         merged["SALARIO A 240"].value_counts().sort_index().plot(kind='bar', title="SALARIO A 240")
         data["SALARIO A 240"] = merged["SALARIO A 240"]
-        plt.show()
+        if self.flag: plt.show()
 
         # Discretize Initial Date
         column = data["FECHA INICIO POSESION"]
@@ -91,7 +89,7 @@ class Discretize:
         column = pd.cut(column.astype(np.int64)//10**9,bins=bins_dt.astype(np.int64)//10**9,labels=labels)
         print column.values.value_counts()
         column.values.value_counts().plot(kind='bar', title="FECHA INICIO POSESION")
-        plt.show()
+        if self.flag: plt.show()
         data["FECHA INICIO POSESION"] = column
 
         # Discretize Primera Alta
@@ -104,7 +102,7 @@ class Discretize:
         column = pd.cut(column.astype(np.int64) // 10 ** 9, bins=bins_dt.astype(np.int64) // 10 ** 9, labels=labels)
         print column.values.value_counts()
         column.values.value_counts().plot(kind='bar', title="PRIMERA ALTA")
-        plt.show()
+        if self.flag: plt.show()
         data["PRIMERA ALTA"] = column
 
         # Discretize Salario
@@ -113,7 +111,7 @@ class Discretize:
         column = pd.cut(column, bins)
         print column.values.value_counts()
         column.values.value_counts().plot(kind='bar', title='HORAS AL MES')
-        plt.show()
+        if self.flag: plt.show()
         data['HORAS AL MES'] = column
 
         # Salarios Minimos
@@ -122,7 +120,7 @@ class Discretize:
         column = pd.cut(column, bins)
         print column.values.value_counts()
         column.values.value_counts().plot(kind='bar', title="SALARIOS MINIMOS")
-        plt.show()
+        if self.flag: plt.show()
         data["SALARIOS MINIMOS"] = column
 
         # Discretize ES AFILIADO A PAC O TIENE AFILIADO A UN FAMILIAR
@@ -131,7 +129,7 @@ class Discretize:
         column = pd.cut(column, bins, labels=["0", "1", "2", "3", "4", "5", "6"])
         print column.values.value_counts()
         column.values.value_counts().plot(kind='bar', title="ES AFILIADO A PAC O TIENE AFILIADO A UN FAMILIAR")
-        plt.show()
+        if self.flag: plt.show()
         data["ES AFILIADO A PAC O TIENE AFILIADO A UN FAMILIAR"] = column
 
         # Discretize AFILIADO A PAC
@@ -142,7 +140,7 @@ class Discretize:
         column = pd.cut(column, bins, labels=["0", "1"])
         print column.values.value_counts()
         column.values.value_counts().plot(kind='bar', title="AFILIADO A PAC")
-        plt.show()
+        if self.flag: plt.show()
         data["AFILIADO A PAC"] = column
 
         # Discretize AFILIADO A PAC
@@ -153,7 +151,7 @@ class Discretize:
         column = pd.cut(column, bins, labels=["0", "1", "2", "3", "4", "5"])
         print column.values.value_counts()
         column.values.value_counts().plot(kind='bar', title="FAMILIAR AFILIADO A PAC")
-        plt.show()
+        if self.flag: plt.show()
         data["FAMILIAR AFILIADO A PAC"] = column
 
         #print data

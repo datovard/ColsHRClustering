@@ -2,6 +2,7 @@ import pandas as pd
 from Preprocessing import Preprocess
 from Discretizing import Discretize
 from Clustering import Cluster
+from Pca import Pca
 
 class Main:
 
@@ -16,8 +17,12 @@ class Main:
         self.dataset = preprocess.preprocessFile()
 
         #Discretize
-        discretize = Discretize( self.dataset )
+        discretize = Discretize( self.dataset, False )
         self.dataset = discretize.discretizeFile()
+
+        #PCA
+        pca = Pca( self.dataset )
+        pca.pca_process()
 
         #Cluster
         cluster = Cluster( self.dataset )
