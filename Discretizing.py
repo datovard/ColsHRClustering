@@ -153,7 +153,6 @@ class Discretize:
         column.values.value_counts().plot(kind='bar', title="FAMILIAR AFILIADO A PAC")
         if self.flag: plt.show()
         data["FAMILIAR AFILIADO A PAC"] = column
-
         #print data
 
         #Renew dataset and return it

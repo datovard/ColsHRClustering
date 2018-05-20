@@ -12,7 +12,7 @@ class Preprocess:
         print "PREPROCESSING MODULE"
 
         self.dataset['SALARIOS MINIMOS'] = pd.Series()
-        self.dataset['SALARIOS MINIMOS'] = self.dataset['SALARIO A 240']/(737717)
+        self.dataset['SALARIOS MINIMOS'] = map( lambda x: round(x, 2), self.dataset['SALARIO A 240']/(737717))
 
         #Missing data in FECHA INICIO POSESION
         mean = datetime.strptime("2005-01-18", '%Y-%m-%d')
