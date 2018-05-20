@@ -74,6 +74,9 @@ class Cluster:
         file = open( folder + "/results.txt", "w+" )
         file.write("Resultados ejecucion K-means\n\n")
 
+        file.write("Variables:\n")
+        file.write(str(keys) + "\n\n")
+        
         for i, kmeans in clusters:
             print "CALCULANDO K =", i
             kmeans.fit(X)
