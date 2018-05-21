@@ -16,7 +16,7 @@ class Main:
         self.dataset = preprocess.preprocessFile()
 
         #Discretize
-        discretize = Discretize( self.dataset, True )
+        discretize = Discretize( self.dataset, False )
         self.dataset = discretize.discretizeFile()
 
         #PCA
@@ -24,8 +24,12 @@ class Main:
         # pca.pca_process()
 
         #Cluster
-        # cluster = Cluster( self.dataset )
+        cluster = Cluster( self.dataset )
         # cluster.startClusteringKMeans()
+
+        #cluster.startClusteringKModesFullDataHuang()
+        cluster.startClusteringKModesFullDataCao()
+
         # cluster.startClusteringKPrototypesFullData()
         # cluster.startClusteringKPrototypesMinData()
 

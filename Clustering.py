@@ -4,7 +4,8 @@ from mpl_toolkits.mplot3d import Axes3D
 
 from sklearn.cluster import KMeans
 from scipy.spatial.distance import pdist, euclidean
-#from kmodes.kprototypes import KPrototypes
+from kmodes.kprototypes import KPrototypes
+from kmodes.kmodes import KModes
 
 class Cluster:
     def __init__(self, dataset):
@@ -15,8 +16,7 @@ class Cluster:
         fig = plt.figure(self.fignum, figsize=(8, 7))
         ax = Axes3D(fig, rect=[0, 0, 1, 1], elev=48, azim=134)
 
-        ax.scatter(data[:, 0], data[:, 1], data[:, 2],
-                   c=labels.astype(np.float), edgecolor='k')
+        ax.scatter(data[:, 0], data[:, 1], data[:, 2], c=labels.astype(np.float), edgecolor='k', s=50 )
 
         ax.w_xaxis.set_ticklabels([])
         ax.w_yaxis.set_ticklabels([])
@@ -31,19 +31,21 @@ class Cluster:
         fig.savefig( folder+title+".png" )
         fig.clf()
 
-    def startClusteringKMeans(self):
-        erase_vars = ['CARGO', 'FECHA INICIO POSESION', 'FIN', 'TURNO',
-                      'SUELDO TEXTO', 'SALARIO', 'HORAS AL MES', 'HORAS SEMANALES', 'HORAS DIARIAS',
-                      'HORARIO TRABAJO', 'GRUPO PERSONAL', 'CLASE DE CONTRATO', 'RELACION LABORAL',
-                      'TIPO DE PACTO', 'PRIMERA ALTA', 'FECHA EXPIRACION CONTRATO', 'AREA DE NOMINA',
-                      'CENTRO DE COSTE', 'DIVISION', 'DIVISION PERSONAL', 'SUBDIVISION PERSONAL',
-                      'AREA DE PERSONAL', 'SEXO', 'ROL DEL EMPLEADO', 'SALARIO A 240',
-                      'TIPO DE PACTO ESPECIFICO', 'FAMILIAR AFILIADO A PAC',
-                      'ES AFILIADO A PAC O TIENE AFILIADO A UN FAMILIAR' ]
+    def getRemovedDataset(self):
+        erase_vars = ['CARGO', 'FECHA INICIO POSESION', 'TURNO', 'HORAS AL MES', 'HORARIO TRABAJO',
+                      'GRUPO PERSONAL', 'CLASE DE CONTRATO', 'RELACION LABORAL', 'TIPO DE PACTO',
+                      'PRIMERA ALTA', 'FECHA EXPIRACION CONTRATO', 'AREA DE NOMINA', 'CENTRO DE COSTE',
+                      'DIVISION', 'DIVISION PERSONAL', 'SUBDIVISION PERSONAL', 'AREA DE PERSONAL', 'SEXO',
+                      'ROL DEL EMPLEADO', 'SALARIO A 240', 'TIPO DE PACTO ESPECIFICO', 'FAMILIAR AFILIADO A PAC',
+                      'ES AFILIADO A PAC O TIENE AFILIADO A UN FAMILIAR']
 
         data = self.dataset.drop(erase_vars, axis=1)
-
         data = data[['SALARIOS MINIMOS', 'EDAD DEL EMPLEADO', 'AFILIADO A PAC', 'CATEGORIA ESPECIFICA', 'CATEGORIA']]
+
+        return data
+
+    def startClusteringKMeans(self):
+        data = self.getRemovedDataset()
 
         # data['AFILIADO A PAC'] = map(lambda x: 0 if x == 1 else 1, data['AFILIADO A PAC'])
 
@@ -118,25 +120,159 @@ class Cluster:
         plt.clf()
         print "LISTO"
 
+    def startClusteringKModesFullDataHuang(self):
+        data = self.dataset
+        cleaned = self.getRemovedDataset()
+
+        folder = "results/clustering/kmodes/"
+
+        self.fignum = 1
+
+        cleaned['SALARIOS MINIMOS'] = cleaned['SALARIOS MINIMOS'].astype("category").cat.codes.values
+        cleaned['EDAD DEL EMPLEADO'] = cleaned['EDAD DEL EMPLEADO'].astype("category").cat.codes.values
+        cleaned['AFILIADO A PAC'] = cleaned['AFILIADO A PAC'].astype("category").cat.codes.values
+
+        categorias = data['CATEGORIA'].astype("category").cat.codes.values
+        especificas = data['CATEGORIA ESPECIFICA'].astype("category").cat.codes.values
+        data.drop(['CATEGORIA', 'CATEGORIA ESPECIFICA'], axis=1, inplace=True)
+        cleaned.drop(['CATEGORIA', 'CATEGORIA ESPECIFICA'], axis=1, inplace=True)
+
+        keys = list(cleaned)
+        X = data.values
+        C = cleaned.values
+        clusters = []
+
+        print "IMPRIMIENDO CLASIFICACION CORRECTA"
+        self.plotCluster(C, categorias, [0, 0, 0, 0], keys, "Clasificacion Original", folder + "huang/")
+        self.plotCluster(C, especificas, [0, 0, 0, 0], keys, "Clasificacion Especifica Original", folder  + "huang/")
+        print "LISTO"
+
+        for i in xrange( 3, self.maxK + 1 ):
+            clusters.append( (i, KModes( n_clusters=i, init='Huang', verbose=0 )) )
+
+        print "CALCULANDO EJECUCIONES K-MODES HUANG"
+        errors = []
+        file = open(folder + "huang/results.txt", "w+")
+        file.write("Resultados ejecucion K-modes\n\n")
+
+        file.write("Variables:\n")
+        file.write(str( list(data) ) + "\n\n")
+
+        for i, k_modes in clusters:
+            print "CALCULANDO K =", i
+            labels = k_modes.fit_predict(X)
+            centers = k_modes.cluster_centroids_
+
+            print "\tError cuadratico:", k_modes.cost_
+            print "\t# iteraciones:", k_modes.n_iter_
+            errors.append(k_modes.cost_)
+
+            file.write("K = " + str(i) + "\n")
+            file.write("\tSuma de distancias cuadradas: " + str(k_modes.cost_) + "\n")
+            file.write("\tIteraciones: " + str(k_modes.n_iter_) + "\n")
+
+            self.plotCluster(C, labels, centers, keys, "K = " + str(len(centers)), folder + "huang/Ks/")
+
+        print "LISTO"
+
+        file.close()
+
+        print "GRAFICANDO INDICES"
+        k_X = np.array(xrange(3, self.maxK + 1))
+        sse_Y = np.array(errors)
+
+        plt.plot(k_X, sse_Y, '-o')
+        plt.xlabel("# de clusters (k)")
+        plt.ylabel("Suma de distancias cuadradas")
+        plt.savefig(folder + "huang/Suma distancias.png")
+        plt.clf()
+        print "LISTO"
+
+    def startClusteringKModesFullDataCao(self):
+        data = self.dataset
+        cleaned = self.getRemovedDataset()
+
+        folder = "results/clustering/kmodes/"
+
+        self.fignum = 1
+
+        cleaned['SALARIOS MINIMOS'] = cleaned['SALARIOS MINIMOS'].astype("category").cat.codes.values
+        cleaned['EDAD DEL EMPLEADO'] = cleaned['EDAD DEL EMPLEADO'].astype("category").cat.codes.values
+        cleaned['AFILIADO A PAC'] = cleaned['AFILIADO A PAC'].astype("category").cat.codes.values
+
+        categorias = data['CATEGORIA'].astype("category").cat.codes.values
+        especificas = data['CATEGORIA ESPECIFICA'].astype("category").cat.codes.values
+        data.drop(['CATEGORIA', 'CATEGORIA ESPECIFICA'], axis=1, inplace=True)
+        cleaned.drop(['CATEGORIA', 'CATEGORIA ESPECIFICA'], axis=1, inplace=True)
+
+        keys = list(cleaned)
+        X = data.values
+        C = cleaned.values
+        clusters = []
+
+        print "IMPRIMIENDO CLASIFICACION CORRECTA"
+        self.plotCluster(C, categorias, [0, 0, 0, 0], keys, "Clasificacion Original", folder + "cao/")
+        self.plotCluster(C, especificas, [0, 0, 0, 0], keys, "Clasificacion Especifica Original", folder  + "cao/")
+        print "LISTO"
+
+        for i in xrange( 3, self.maxK + 1 ):
+            clusters.append( (i, KModes( n_clusters=i, init='Cao', verbose=0 )) )
+
+        print "CALCULANDO EJECUCIONES K-MODES CAO"
+        errors = []
+        file = open(folder + "cao/results.txt", "w+")
+        file.write("Resultados ejecucion K-modes\n\n")
+
+        file.write("Variables:\n")
+        file.write(str( list(data) ) + "\n\n")
+
+        for i, k_modes in clusters:
+            print "CALCULANDO K =", i
+            labels = k_modes.fit_predict(X)
+            centers = k_modes.cluster_centroids_
+
+            print "\tError cuadratico:", k_modes.cost_
+            print "\t# iteraciones:", k_modes.n_iter_
+            errors.append(k_modes.cost_)
+
+            file.write("K = " + str(i) + "\n")
+            file.write("\tSuma de distancias cuadradas: " + str(k_modes.cost_) + "\n")
+            file.write("\tIteraciones: " + str(k_modes.n_iter_) + "\n")
+
+            self.plotCluster(C, labels, centers, keys, "K = " + str(len(centers)), folder + "cao/Ks/")
+
+        print "LISTO"
+
+        file.close()
+
+        print "GRAFICANDO INDICES"
+        k_X = np.array(xrange(3, self.maxK + 1))
+        sse_Y = np.array(errors)
+
+        plt.plot(k_X, sse_Y, '-o')
+        plt.xlabel("# de clusters (k)")
+        plt.ylabel("Suma de distancias cuadradas")
+        plt.savefig(folder + "cao/Suma distancias.png")
+        plt.clf()
+        print "LISTO"
+
+
     def startClusteringKPrototypesFullData(self):
         data = self.dataset
 
-        erase_vars = ['FECHA INICIO POSESION', 'FIN', 'PRIMERA ALTA', 'FECHA EXPIRACION CONTRATO', 'CATEGORIA ESPECIFICA']
-
-        data = data.drop(erase_vars, axis=1)
-
-        data['AFILIADO A PAC'] = data['AFILIADO A PAC'].astype("category")
-        data['FAMILIAR AFILIADO A PAC'] = data['FAMILIAR AFILIADO A PAC'].astype("category")
-        data['ES AFILIADO A PAC O TIENE AFILIADO A UN FAMILIAR'] = data['ES AFILIADO A PAC O TIENE AFILIADO A UN FAMILIAR'].astype("category")
-
         categorias = data['CATEGORIA'].astype("category").cat.codes.values
-        data.drop(['CATEGORIA'], axis=1, inplace=True)
+        especificas = data['CATEGORIA ESPECIFICA'].astype("category").cat.codes.values
+        data.drop(['CATEGORIA', 'CATEGORIA ESPECIFICA'], axis=1, inplace=True)
 
         keys = list(data)
         X = data.values
 
+        for i in xrange( len(keys) ):
+            print keys[i], "\t", X[0][i], "\t", type( X[0][1] )
+
         print "CORRIENDO K-PROTOTYPES CON K = 4"
-        k_prot = KPrototypes( n_clusters=4, init='Cao', verbose=0 )
+        '''k_prot = KPrototypes( n_clusters=4, init='Cao', verbose=0 )
+
         clusters = k_prot.fit_predict(X, categorical=[0, 1, 2, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 20, 22, 23, 24, 25])
         centroids = k_prot.cluster_centroids_
 
@@ -148,7 +284,7 @@ class Cluster:
                 bad += 1
 
         print good, bad
-        print (float(good)/len(clusters))*100.0, (float(bad)/len(clusters))*100.0
+        print (float(good)/len(clusters))*100.0, (float(bad)/len(clusters))*100.0'''
 
     def daviesbouldin( self, X, labels, centroids ):
         nbre_of_clusters = len(centroids)  # Get the number of clusters
