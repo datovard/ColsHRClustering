@@ -3,6 +3,7 @@ from Preprocessing import Preprocess
 from Discretizing import Discretize
 from Clustering import Cluster
 from Pca import Pca
+from DecisionTree import DecisionTree
 
 class Main:
 
@@ -23,12 +24,17 @@ class Main:
         # pca = Pca( self.dataset )
         # pca.pca_process()
 
+        #DecisionTree
+        decisionTree = DecisionTree( self.dataset )
+        decisionTree.run()
+
+
         #Cluster
-        cluster = Cluster( self.dataset )
+        # cluster = Cluster( self.dataset )
         # cluster.startClusteringKMeans()
 
-        #cluster.startClusteringKModesFullDataHuang()
-        cluster.startClusteringKModesFullDataCao()
+        # cluster.startClusteringKModesFullDataHuang()
+        # cluster.startClusteringKModesFullDataCao()
 
         # cluster.startClusteringKPrototypesFullData()
         # cluster.startClusteringKPrototypesMinData()
