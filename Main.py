@@ -2,8 +2,13 @@ import pandas as pd
 from Preprocessing import Preprocess
 from Discretizing import Discretize
 from Clustering import Cluster
-from Pca import Pca
+
+from Transformator import Transformator
+from NaiveBayes import NaiveBayes
 from DecisionTree import DecisionTree
+from NeuralNetwork import NeuralNetwork
+from SupportVectorMachine import SupportVectorMachine
+from KNearest import KNearest
 
 class Main:
 
@@ -17,17 +22,32 @@ class Main:
         self.dataset = preprocess.preprocessFile()
 
         #Discretize
-        discretize = Discretize( self.dataset, True )
+        discretize = Discretize( self.dataset, False )
         self.dataset = discretize.discretizeFile()
 
-        #PCA
-        # pca = Pca( self.dataset )
-        # pca.pca_process()
+        #Transform data
+        transform = Transformator( self.dataset )
+        X_train, X_test, Y_train, Y_test, trans = transform.run()
+
+        #Bayes Naive
+        bayes = NaiveBayes( X_train, X_test, Y_train, Y_test, trans )
+        bayes.run()
 
         #DecisionTree
-        #decisionTree = DecisionTree( self.dataset )
-        #decisionTree.run()
+        decisionTree = DecisionTree( X_train, X_test, Y_train, Y_test, trans )
+        decisionTree.run()
 
+        #NeuralNetwork
+        neuralNet = NeuralNetwork( X_train, X_test, Y_train, Y_test, trans )
+        neuralNet.run()
+
+        #SVM
+        svm = SupportVectorMachine( X_train, X_test, Y_train, Y_test, trans )
+        svm.run()
+
+        #K-Nearest
+        neigh = KNearest( X_train, X_test, Y_train, Y_test, trans )
+        neigh.run()
 
         #Cluster
         # cluster = Cluster( self.dataset )

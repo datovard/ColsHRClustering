@@ -3,6 +3,7 @@ import pandas as pd
 from sklearn.cross_validation import train_test_split
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.metrics import accuracy_score
+from sklearn.metrics import classification_report, confusion_matrix
 from sklearn import tree
 from sklearn import preprocessing
 
@@ -13,67 +14,44 @@ import pydotplus
 
 class DecisionTree:
 
-    def __init__(self, dataset):
+    def __init__(self, X_train, X_test, Y_train, Y_test, trans):
 
-        self.dataset = dataset
+        self.X_train = X_train.copy(deep=True)
+        self.X_test = X_test.copy(deep=True)
+        self.Y_train = Y_train.copy(deep=True)
+        self.Y_test = Y_test.copy(deep=True)
+        self.Y_pred = []
+        self.trans = trans
 
 
     def run(self):
 
-        data = self.dataset
-
-        #Index for Tree
-        keys = [
-            'GRUPO PERSONAL', 'CLASE DE CONTRATO', 'RELACION LABORAL', 'TIPO DE PACTO',
-            'AREA DE NOMINA', 'DIVISION', 'SEXO', 'EDAD DEL EMPLEADO',
-            'ROL DEL EMPLEADO', 'SALARIOS MINIMOS', 'TIPO DE PACTO ESPECIFICO', 'AFILIADO A PAC', 'FAMILIAR AFILIADO A PAC',
-            'ES AFILIADO A PAC O TIENE AFILIADO A UN FAMILIAR', 'CATEGORIA ESPECIFICA',
-        ]
-
-        #Transform to Numbers
-        trans = {}
-        for k in keys:
-            trans[k] = {}
-            t_counter = 0
-            data_n = []
-            for term in data[k]:
-                if term not in trans[k]:
-                    trans[k][term] = t_counter
-                    t_counter +=1
-                data_n.append(trans[k][term])
-            data[k] = data_n
-
-        for k in data.keys():
-            if k not in keys:
-                data.drop(k, axis=1, inplace=True)
-
-        #Split Categories and Variables
-        X = data.values[:, 0:-2]
-        Y = data.values[:, -1]
-
-        #Split 70 to traing and 30 to test
-        X_train, X_test, Y_train, Y_test = train_test_split(X, Y , test_size=0.3, random_state=21)
+        print "DECISION TREE"
 
         #Gini
-        clf_gini = DecisionTreeClassifier(criterion="gini", random_state=100, max_depth=3, min_samples_leaf=5)
-        clf_gini.fit(X_train, Y_train)
-        Y_pred = clf_gini.predict(X_test)
-        print "Accuracy for Gini is:", accuracy_score(Y_test, Y_pred) * 100
-
-        #Entropy
-        clf_entropy = DecisionTreeClassifier(criterion="entropy", random_state=100, max_depth=3, min_samples_leaf=5)
-        clf_entropy.fit(X_train, Y_train)
-        Y_pred = clf_entropy.predict(X_test)
-        print "Accuracy for Entropy is:", accuracy_score(Y_test, Y_pred) * 100
+        clf_gini = DecisionTreeClassifier(criterion="gini", random_state=21, max_depth=5, min_samples_leaf=8)
+        clf_gini.fit(self.X_train, self.Y_train)
+        self.Y_pred = clf_gini.predict(self.X_test)
+        print "Accuracy for Gini is:", accuracy_score(self.Y_test, self.Y_pred) * 100
+        print(confusion_matrix(self.Y_test, self.Y_pred))
+        print(classification_report(self.Y_test, self.Y_pred))
 
         dot_data = StringIO()
-        export_graphviz(clf_gini, out_file=dot_data, filled=True, rounded=True, special_characters=True)
+        export_graphviz(clf_gini, out_file=dot_data, filled=True, rounded=True, special_characters=True, feature_names=self.X_train.keys(), class_names=sorted(self.trans['CATEGORIA'].keys()))
         graph = pydotplus.graph_from_dot_data(dot_data.getvalue())
         img = Image(graph.create_png())
         display(img)
 
+        #Entropy
+        clf_entropy = DecisionTreeClassifier(criterion="entropy", random_state=23, max_depth=5, min_samples_leaf=8)
+        clf_entropy.fit(self.X_train, self.Y_train)
+        self.Y_pred = clf_entropy.predict(self.X_test)
+        print "Accuracy for Entropy is:", accuracy_score(self.Y_test, self.Y_pred) * 100
+        print(confusion_matrix(self.Y_test, self.Y_pred))
+        print(classification_report(self.Y_test, self.Y_pred))
+
         dot_data = StringIO()
-        export_graphviz(clf_entropy, out_file=dot_data, filled=True, rounded=True, special_characters=True)
+        export_graphviz(clf_entropy, out_file=dot_data, filled=True, rounded=True, special_characters=True, feature_names=self.X_train.keys(), class_names=sorted(self.trans['CATEGORIA'].keys()))
         graph = pydotplus.graph_from_dot_data(dot_data.getvalue())
         img = Image(graph.create_png())
         display(img)

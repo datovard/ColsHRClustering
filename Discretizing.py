@@ -99,25 +99,42 @@ class Discretize:
         # Discretize Salary
         print "SALARIOS MINIMOS"
         column = data["SALARIOS MINIMOS"]
+        print max(data["SALARIOS MINIMOS"]), min(data["SALARIOS MINIMOS"])
         plt.title("SALARIOS MINIMOS")
         grid = plt.GridSpec(1, 3, wspace=0.4, hspace=0.3)
         plt.subplot(grid[0, 0])
         column.plot(kind='box', title="Diagrama de caja")
         plt.subplot(grid[0, 1], title="Normal")
-        column.hist(bins=23)
+        column.hist(bins=30)
+        plt.subplot(grid[0, 2])
+        column = pd.cut(column, range(31), labels=self.helper(0,30))
+        column.values.value_counts().plot(kind='bar', title="Discretizado")
+        if self.flag: plt.show()
+        data["SALARIOS MINIMOS"] = column
+
+        """
+        # Discretize Salary
+        print "SALARIOS MINIMOS"
+        column = data["SALARIOS MINIMOS"]
+        print max(data["SALARIOS MINIMOS"]), min(data["SALARIOS MINIMOS"])
+        plt.title("SALARIOS MINIMOS")
+        grid = plt.GridSpec(1, 3, wspace=0.4, hspace=0.3)
+        plt.subplot(grid[0, 0])
+        column.plot(kind='box', title="Diagrama de caja")
+        plt.subplot(grid[0, 1], title="Normal")
+        column.hist(bins=30)
         plt.subplot(grid[0, 2])
         range1 = data[data["SALARIOS MINIMOS"] > 0][data["SALARIOS MINIMOS"] <= 10]
-        range2 = data[data["SALARIOS MINIMOS"] > 12][data["SALARIOS MINIMOS"] <= 17]
-        range3 = data[data["SALARIOS MINIMOS"] > 20][data["SALARIOS MINIMOS"] <= 21]
-
+        range2 = data[data["SALARIOS MINIMOS"] > 10][data["SALARIOS MINIMOS"] <= 20]
+        range3 = data[data["SALARIOS MINIMOS"] > 20][data["SALARIOS MINIMOS"] <= 30]
         range1["SALARIOS MINIMOS"] = pd.cut(range1["SALARIOS MINIMOS"], range(0,10), labels=self.helper(0,9))
-        range2["SALARIOS MINIMOS"] = pd.cut(range2["SALARIOS MINIMOS"], range(12,18), labels=self.helper(12,17))
-        range3["SALARIOS MINIMOS"] = pd.cut(range3["SALARIOS MINIMOS"], range(20, 22), labels=self.helper(20,21))
-
+        range2["SALARIOS MINIMOS"] = pd.cut(range2["SALARIOS MINIMOS"], range(10,20), labels=self.helper(10,19))
+        range3["SALARIOS MINIMOS"] = pd.cut(range3["SALARIOS MINIMOS"], range(20, 30), labels=self.helper(20,29))
         merged = pd.concat([range1, range2, range3])
         merged["SALARIOS MINIMOS"].value_counts().sort_index().plot(kind='bar', title="SALARIOS MINIMOS")
         if self.flag: plt.show()
         data["SALARIOS MINIMOS"] = merged["SALARIOS MINIMOS"]
+        """
 
         # Discretize Horas al mes
         print "HORAS AL MES"
@@ -131,6 +148,7 @@ class Discretize:
         plt.subplot(grid[0, 2])
         column = pd.cut(column, range(0, 280, 30))#, [0, 20, 30, 40, 50, 60, 100],labels=["(... - 20", "(20 - 30]", "(30 - 40]", "(40 - 50]", "(50 - 60]", "(60 - ...]", ])
         column.values.value_counts().plot(kind='bar', title="Discretizado")
+        data["HORAS AL MES"] = column
         if self.flag: plt.show()
 
         grid = plt.GridSpec(1, 3, wspace=0.4, hspace=0.3)
@@ -176,6 +194,7 @@ class Discretize:
         #if self.flag: self.savePlot(folder + "FECHA INICIO POSESION.png", 0.4)
         data["FECHA INICIO POSESION"] = column
 
+        """
         # Discretize Primera Alta
         column = data["PRIMERA ALTA"]
         bins_dt = pd.date_range('1976-09-28', freq='7AS', periods=7)
@@ -185,6 +204,7 @@ class Discretize:
         column.values.value_counts().plot(kind='bar', title="PRIMERA ALTA")
         #if self.flag: self.savePlot(folder + "PRIMERA ALTA.png", None)
         data["PRIMERA ALTA"] = column
+        """
 
 
         #print data
