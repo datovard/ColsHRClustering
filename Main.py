@@ -17,7 +17,7 @@ class Main:
         self.dataset = preprocess.preprocessFile()
 
         #Discretize
-        discretize = Discretize( self.dataset, False )
+        discretize = Discretize( self.dataset, True )
         self.dataset = discretize.discretizeFile()
 
         #PCA
@@ -25,8 +25,8 @@ class Main:
         # pca.pca_process()
 
         #DecisionTree
-        decisionTree = DecisionTree( self.dataset )
-        decisionTree.run()
+        #decisionTree = DecisionTree( self.dataset )
+        #decisionTree.run()
 
 
         #Cluster

@@ -6,6 +6,11 @@ from sklearn.metrics import accuracy_score
 from sklearn import tree
 from sklearn import preprocessing
 
+from sklearn.externals.six import StringIO
+from IPython.display import display, Image
+from sklearn.tree import export_graphviz
+import pydotplus
+
 class DecisionTree:
 
     def __init__(self, dataset):
@@ -47,7 +52,7 @@ class DecisionTree:
         Y = data.values[:, -1]
 
         #Split 70 to traing and 30 to test
-        X_train, X_test, Y_train, Y_test = train_test_split(X, Y , test_size=0.3, random_state=100)
+        X_train, X_test, Y_train, Y_test = train_test_split(X, Y , test_size=0.3, random_state=21)
 
         #Gini
         clf_gini = DecisionTreeClassifier(criterion="gini", random_state=100, max_depth=3, min_samples_leaf=5)
@@ -61,4 +66,14 @@ class DecisionTree:
         Y_pred = clf_entropy.predict(X_test)
         print "Accuracy for Entropy is:", accuracy_score(Y_test, Y_pred) * 100
 
+        dot_data = StringIO()
+        export_graphviz(clf_gini, out_file=dot_data, filled=True, rounded=True, special_characters=True)
+        graph = pydotplus.graph_from_dot_data(dot_data.getvalue())
+        img = Image(graph.create_png())
+        display(img)
 
+        dot_data = StringIO()
+        export_graphviz(clf_entropy, out_file=dot_data, filled=True, rounded=True, special_characters=True)
+        graph = pydotplus.graph_from_dot_data(dot_data.getvalue())
+        img = Image(graph.create_png())
+        display(img)
