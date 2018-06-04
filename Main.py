@@ -2,12 +2,13 @@ import pandas as pd
 from Preprocessing import Preprocess
 from Discretizing import Discretize
 from Clustering import Cluster
-from Classifying import Classify
+#from Classifier import Classify
 from Pca import Pca
 import matplotlib.pyplot as plt
 import seaborn as sns; sns.set()
 import numpy as np
 from sklearn.metrics import accuracy_score, confusion_matrix, roc_curve, auc
+from sklearn.model_selection import train_test_split
 from collections import OrderedDict
 
 from Transformator import Transformator
@@ -16,6 +17,8 @@ from DecisionTree import DecisionTree
 from NeuralNetwork import NeuralNetwork
 from SupportVectorMachine import SupportVectorMachine
 from KNearest import KNearest
+
+import random
 
 class Main:
 
@@ -81,20 +84,59 @@ class Main:
         preprocess = Preprocess( self.dataset )
         self.dataset = preprocess.preprocessFile()
 
-        self.names = list(OrderedDict.fromkeys(self.dataset['CATEGORIA'].values))
-
         #Discretize
         discretize = Discretize( self.dataset, False )
         self.dataset = discretize.discretizeFile()
 
-        #Transform data
-        transform = Transformator( self.dataset )
-        X_train, X_test, Y_train, Y_test, trans = transform.run()
-        classify = Classify(self.dataset)
-        bernoulli = classify.classifyBernoulliNB()
+        self.names = list(OrderedDict.fromkeys(self.dataset['CATEGORIA'].values))
+        self.names.pop(0)
 
-        self.plotROCCurves(bernoulli)
-        self.plotConfusionMatrix(bernoulli)
+        #Transform data
+        transformator = Transformator( self.dataset )
+        data, trans = transformator.run()
+
+        #Bayes Naive
+        bayes = NaiveBayes( data )
+        resp = bayes.run()
+
+        self.plotROCCurves(resp)
+        self.plotConfusionMatrix(resp)
+
+        Y = data['CATEGORIA']
+        # Y = data['CATEGORIA ESPECIFICA']
+
+        # Drop the classifiers
+        data = data.drop(['CATEGORIA ESPECIFICA', 'CATEGORIA'], axis=1)
+        X = data[:]
+
+        # Split 70 to traing and 30 to test
+        X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.3, random_state=random.randint(0, 100))
+
+        #DecisionTree
+        decisionTree = DecisionTree( X_train, X_test, Y_train, Y_test, trans )
+        decisionTree.run()
+
+        #NeuralNetwork
+        '''neuralNet = NeuralNetwork( X_train, X_test, Y_train, Y_test, trans )
+        neuralNet.run()
+
+        #SVM
+        svm = SupportVectorMachine( X_train, X_test, Y_train, Y_test, trans )
+        svm.run()
+
+        #K-Nearest
+        neigh = KNearest( X_train, X_test, Y_train, Y_test, trans )
+        neigh.run()'''
+
+        #Cluster
+        # cluster = Cluster( self.dataset )
+        # cluster.startClusteringKMeans()
+
+        # cluster.startClusteringKModesFullDataHuang()
+        # cluster.startClusteringKModesFullDataCao()
+
+        # cluster.startClusteringKPrototypesFullData()
+        # cluster.startClusteringKPrototypesMinData()
 
         # cluster1 = Cluster(self.dataset)
         # cluster1.startClusteringKMeans()
@@ -106,36 +148,6 @@ class Main:
         #PCA
         # pca = Pca( self.dataset )
         # pca.pca_process()
-
-        #Bayes Naive
-        bayes = NaiveBayes( X_train, X_test, Y_train, Y_test, trans )
-        bayes.run()
-
-        #DecisionTree
-        decisionTree = DecisionTree( X_train, X_test, Y_train, Y_test, trans )
-        decisionTree.run()
-
-        #NeuralNetwork
-        neuralNet = NeuralNetwork( X_train, X_test, Y_train, Y_test, trans )
-        neuralNet.run()
-
-        #SVM
-        svm = SupportVectorMachine( X_train, X_test, Y_train, Y_test, trans )
-        svm.run()
-
-        #K-Nearest
-        neigh = KNearest( X_train, X_test, Y_train, Y_test, trans )
-        neigh.run()
-
-        #Cluster
-        # cluster = Cluster( self.dataset )
-        # cluster.startClusteringKMeans()
-
-        # cluster.startClusteringKModesFullDataHuang()
-        # cluster.startClusteringKModesFullDataCao()
-
-        # cluster.startClusteringKPrototypesFullData()
-        # cluster.startClusteringKPrototypesMinData()
 
 file = 'files/database.csv'
 

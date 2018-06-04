@@ -1,28 +1,38 @@
-from sklearn.cross_validation import train_test_split
-from sklearn.metrics import accuracy_score
-from sklearn.metrics import classification_report, confusion_matrix
-from sklearn.naive_bayes import MultinomialNB
+import numpy as np
+import pandas as pd
+import seaborn as sns; sns.set()
+from sklearn import datasets
+iris = datasets.load_iris()
+from sklearn.naive_bayes import BernoulliNB
+from sklearn.metrics import accuracy_score, confusion_matrix, roc_curve, auc
+from sklearn.model_selection import train_test_split, cross_val_score, cross_val_predict, StratifiedKFold
+from sklearn.multiclass import OneVsRestClassifier
+from sklearn.preprocessing import label_binarize
+from scipy import interp
+
 from collections import OrderedDict
 
-class NaiveBayes:
+from Classifier import Classifier
 
-    def __init__(self, X_train, X_test, Y_train, Y_test, trans):
-
-        self.X_train = X_train.copy(deep=True)
-        self.X_test = X_test.copy(deep=True)
-        self.Y_train = Y_train.copy(deep=True)
-        self.Y_test = Y_test.copy(deep=True)
-        self.Y_pred = []
-        self.trans = trans
+class NaiveBayes(Classifier):
+    def __init__(self, dataset):
+        self.data = dataset.copy(deep=True)
 
     def run(self):
+        erase_vars = ['FECHA INICIO POSESION']
+        self.data.drop(erase_vars, axis=1, inplace=True)
 
-        print "NAIVE BAYES"
+        names = list(OrderedDict.fromkeys(self.data['CATEGORIA'].values))
+        y = self.data['CATEGORIA'].astype("category").cat.codes.values
+        self.data.drop(['CATEGORIA ESPECIFICA', 'CATEGORIA'], axis=1, inplace=True)
 
-        #Multinomial Naive Bayes
-        bayes = MultinomialNB()
-        bayes.fit(self.X_train, self.Y_train)
-        self.Y_pred = bayes.predict(self.X_test)
-        print "Accuracy for Naive Bayes is:", accuracy_score(self.Y_test, self.Y_pred) * 100
-        print(confusion_matrix(self.Y_test, self.Y_pred))
-        print(classification_report(self.Y_test, self.Y_pred))
+        self.data = pd.get_dummies(self.data)
+
+        X = self.data.values
+
+        classifier = OneVsRestClassifier(BernoulliNB())
+
+        ROC = self.getROC( X, y, classifier, len(names) )
+        ROC["prediction"] = self.getPrediction( X, y, classifier )
+        ROC["y_true"] = y
+        return ROC

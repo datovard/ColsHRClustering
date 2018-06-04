@@ -9,7 +9,6 @@ class Transformator:
         self.trans = {}
 
     def run(self):
-
         #Deep copy of data
         data = self.dataset.copy(deep=True)
 
@@ -40,8 +39,9 @@ class Transformator:
             data[k] = data_n
 
         # Separate the classifiers
+        return data, trans
 
-        Y = data['CATEGORIA']
+        '''Y = data['CATEGORIA']
         # Y = data['CATEGORIA ESPECIFICA']
 
         # Drop the classifiers
@@ -51,4 +51,4 @@ class Transformator:
         # Split 70 to traing and 30 to test
         X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.3, random_state=random.randint(0,100))
 
-        return X_train, X_test, Y_train, Y_test, trans
+        return X_train, X_test, Y_train, Y_test, trans'''

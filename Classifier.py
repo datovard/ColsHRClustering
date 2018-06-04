@@ -1,39 +1,11 @@
 import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
 import seaborn as sns; sns.set()
-from sklearn import datasets
-iris = datasets.load_iris()
-from sklearn.naive_bayes import GaussianNB, BernoulliNB
-from sklearn.metrics import accuracy_score, confusion_matrix, roc_curve, auc
-from sklearn.model_selection import train_test_split, cross_val_score, cross_val_predict, StratifiedKFold
-from sklearn.multiclass import OneVsRestClassifier
+from sklearn.metrics import roc_curve, auc
+from sklearn.model_selection import cross_val_predict, StratifiedKFold
 from sklearn.preprocessing import label_binarize
 from scipy import interp
 
-from itertools import cycle
-from collections import OrderedDict
-
-
-class Classify:
-    def __init__(self, dataset):
-        self.dataset = dataset
-
-    def getRemovedDataset(self):
-        data = self.dataset.copy(deep=True)
-
-        erase_vars = ['CARGO', 'FECHA INICIO POSESION', 'TURNO', 'HORAS AL MES', 'HORARIO TRABAJO',
-                      'GRUPO PERSONAL', 'CLASE DE CONTRATO', 'RELACION LABORAL', 'TIPO DE PACTO',
-                      'PRIMERA ALTA', 'FECHA EXPIRACION CONTRATO', 'AREA DE NOMINA', 'CENTRO DE COSTE',
-                      'DIVISION', 'DIVISION PERSONAL', 'SUBDIVISION PERSONAL', 'AREA DE PERSONAL', 'SEXO',
-                      'ROL DEL EMPLEADO', 'SALARIO A 240', 'TIPO DE PACTO ESPECIFICO', 'FAMILIAR AFILIADO A PAC',
-                      'ES AFILIADO A PAC O TIENE AFILIADO A UN FAMILIAR']
-
-        data.drop(erase_vars, axis=1, inplace=True)
-        data = data[['SALARIOS MINIMOS', 'EDAD DEL EMPLEADO', 'AFILIADO A PAC', 'CATEGORIA ESPECIFICA', 'CATEGORIA']]
-
-        return data
-
+class Classifier:
     def getConfusionMatrix(self, classes, y_true, y_pred):
         a = np.zeros(shape=(len(classes), len(classes)), dtype=np.int8)
 
@@ -94,27 +66,6 @@ class Classify:
         roc_auc["macro"] = auc(fpr["macro"], tpr["macro"])
 
         return  fpr["macro"], tpr["macro"], roc_auc["macro"]
-
-    def classifyBernoulliNB(self):
-        data = self.dataset.copy(deep=True)
-
-        erase_vars = ['CARGO', 'FECHA INICIO POSESION', 'PRIMERA ALTA', 'FECHA EXPIRACION CONTRATO']
-        data.drop(erase_vars, axis=1, inplace=True)
-
-        names = list(OrderedDict.fromkeys(data['CATEGORIA'].values))
-        y = data['CATEGORIA'].astype("category").cat.codes.values
-        data.drop(['CATEGORIA ESPECIFICA', 'CATEGORIA'], axis=1, inplace=True)
-
-        data = pd.get_dummies(data)
-
-        X = data.values
-
-        classifier = OneVsRestClassifier(BernoulliNB())
-
-        ROC = self.getROC( X, y, classifier, len(names) )
-        ROC["prediction"] = self.getPrediction( X, y, classifier )
-        ROC["y_true"] = y
-        return ROC
 
     def getROC(self, X, y, classifier, clasLen):
         # Binarize the output

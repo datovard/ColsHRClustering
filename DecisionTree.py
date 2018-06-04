@@ -1,18 +1,13 @@
-import numpy as np
-import pandas as pd
-from sklearn.cross_validation import train_test_split
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import classification_report, confusion_matrix
-from sklearn import tree
-from sklearn import preprocessing
-
 from sklearn.externals.six import StringIO
 from IPython.display import display, Image
 from sklearn.tree import export_graphviz
 import pydotplus
+from Classifier import Classifier
 
-class DecisionTree:
+class DecisionTree(Classifier):
 
     def __init__(self, X_train, X_test, Y_train, Y_test, trans):
 
@@ -25,11 +20,11 @@ class DecisionTree:
 
 
     def run(self):
-
         print "DECISION TREE"
 
         #Gini
         clf_gini = DecisionTreeClassifier(criterion="gini", random_state=21, max_depth=5, min_samples_leaf=8)
+
         clf_gini.fit(self.X_train, self.Y_train)
         self.Y_pred = clf_gini.predict(self.X_test)
         print "Accuracy for Gini is:", accuracy_score(self.Y_test, self.Y_pred) * 100
