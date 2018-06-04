@@ -109,21 +109,27 @@ class Classify:
 
         X = data.values
 
+        classifier = OneVsRestClassifier(BernoulliNB())
+
+        ROC = self.getROC( X, y, classifier, len(names) )
+        ROC["prediction"] = self.getPrediction( X, y, classifier )
+        ROC["y_true"] = y
+        return ROC
+
+    def getROC(self, X, y, classifier, clasLen):
         # Binarize the output
-        y_ = label_binarize(y, classes=xrange(len(names)))
+        y_ = label_binarize(y, classes=xrange(clasLen))
         n_classes = y_.shape[1]
 
         # Learn to predict each class against the other
         # Run classifier with cross-validation and plot ROC curves
         cv = StratifiedKFold(n_splits=6)
-        classifier = OneVsRestClassifier(BernoulliNB())
 
+        total = []
         tprs = []
         aucs = []
         mean_fpr = np.linspace(0, 1, 100)
 
-        i = 0
-        plt.clf()
         for train, test in cv.split(X, y):
             classifier.fit(X[train], y_[train])
             probas_ = classifier.predict_proba(X[test])
@@ -132,96 +138,10 @@ class Classify:
             tprs.append(interp(mean_fpr, fpr, tpr))
             tprs[-1][0] = 0.0
             aucs.append(roc_auc)
-            plt.plot(fpr, tpr, lw=1, alpha=0.3,
-                     label='ROC fold %d (AUC = %0.2f)' % (i, roc_auc))
+            total.append([fpr, tpr])
 
-            i += 1
-        plt.plot([0, 1], [0, 1], linestyle='--', lw=2, color='r',
-                 label='Luck', alpha=.8)
+        return {"total": total, "tprs": tprs, "aucs": aucs, "mean_fpr": mean_fpr}
 
-        mean_tpr = np.mean(tprs, axis=0)
-        mean_tpr[-1] = 1.0
-        mean_auc = auc(mean_fpr, mean_tpr)
-        std_auc = np.std(aucs)
-        plt.plot(mean_fpr, mean_tpr, color='b',
-                 label=r'Mean ROC (AUC = %0.2f $\pm$ %0.2f)' % (mean_auc, std_auc),
-                 lw=2, alpha=.8)
-
-        std_tpr = np.std(tprs, axis=0)
-        tprs_upper = np.minimum(mean_tpr + std_tpr, 1)
-        tprs_lower = np.maximum(mean_tpr - std_tpr, 0)
-        plt.fill_between(mean_fpr, tprs_lower, tprs_upper, color='grey', alpha=.2,
-                         label=r'$\pm$ 1 std. dev.')
-
-        plt.xlim([-0.05, 1.05])
-        plt.ylim([-0.05, 1.05])
-        plt.xlabel('False Positive Rate')
-        plt.ylabel('True Positive Rate')
-        plt.title('Receiver operating characteristic example')
-        plt.legend(loc="lower right")
-        plt.show()
-
-        '''mat = confusion_matrix(y_true[0], predictions[0])
-        sns.heatmap(mat.T, square=True, annot=True, fmt='d', cbar=False,
-                    xticklabels=names, yticklabels=names)
-        plt.xlabel('Verdaderos')
-        plt.ylabel('Predecidos');
-        plt.show()'''
-
-
-
-
-
-
-
-
-
-
-
-
-
-        # Compute ROC curve and ROC area for each class
-        #fpr, tpr, roc_auc = self.getROCValues(n_classes, y_test, y_score)
-
-        '''lw = 2
-        # Plot all ROC curves
-        plt.figure()
-        plt.plot(fpr["micro"], tpr["micro"],
-                 label='micro-average ROC curve (area = {0:0.2f})'
-                       ''.format(roc_auc["micro"]),
-                 color='deeppink', linestyle=':', linewidth=4)
-
-        plt.plot(fpr, tpr,
-                 label='macro-average ROC curve (area = {0:0.2f})'
-                       ''.format(roc_auc),
-                 color='navy', linestyle=':', linewidth=4)
-
-        colors = cycle(['aqua', 'darkorange', 'cornflowerblue'])
-        for i, color in zip(range(n_classes), colors):
-            plt.plot(fpr[i], tpr[i], color=color, lw=lw,
-                     label='ROC curve of class {0} (area = {1:0.2f})'
-                           ''.format(names[i], roc_auc[i]))
-
-        plt.plot([0, 1], [0, 1], 'k--', lw=lw)
-        plt.xlim([0.0, 1.0])
-        plt.ylim([0.0, 1.05])
-        plt.xlabel('False Positive Rate')
-        plt.ylabel('True Positive Rate')
-        plt.title('Some extension of Receiver operating characteristic to multi-class')
-        plt.legend(loc="lower right")
-        plt.show()'''
-
-        '''
-        predict = cross_val_predict( bnb, X, Y, cv=10 )
-
-
-        print "Precision:", accuracy_score(Y, predict) * 100
-
-        mat = confusion_matrix(Y, predict)
-        sns.heatmap(mat.T, square=True, annot=True, fmt='d', cbar=False,
-                    xticklabels=names, yticklabels=names)
-        plt.xlabel('Verdaderos')
-        plt.ylabel('Predecidos');
-        plt.show()
-
-        self.getConfusionMatrix(names, Y, predict)'''
+    def getPrediction(self, X, y, classifier):
+        prediction = cross_val_predict( classifier, X, y, cv=10 )
+        return prediction
