@@ -1,28 +1,25 @@
-import numpy as np
 import pandas as pd
-import seaborn as sns; sns.set()
-from sklearn import datasets
-iris = datasets.load_iris()
 from sklearn.naive_bayes import BernoulliNB
-from sklearn.metrics import accuracy_score, confusion_matrix, roc_curve, auc
-from sklearn.model_selection import train_test_split, cross_val_score, cross_val_predict, StratifiedKFold
 from sklearn.multiclass import OneVsRestClassifier
-from sklearn.preprocessing import label_binarize
-from scipy import interp
-
+from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
 from collections import OrderedDict
 
 from Classifier import Classifier
 
 class NaiveBayes(Classifier):
-    def __init__(self, dataset):
-        self.data = dataset.copy(deep=True)
+    def __init__(self, _data, _cv):
+        Classifier.__init__(self, _cv)
+        self.data = _data.copy(deep=True)
+        self.cv = _cv
 
     def run(self):
+        print "BERNOULLI NAIVE BAYES"
+
         erase_vars = ['FECHA INICIO POSESION']
         self.data.drop(erase_vars, axis=1, inplace=True)
 
         names = list(OrderedDict.fromkeys(self.data['CATEGORIA'].values))
+        names.pop(0)
         y = self.data['CATEGORIA'].astype("category").cat.codes.values
         self.data.drop(['CATEGORIA ESPECIFICA', 'CATEGORIA'], axis=1, inplace=True)
 
@@ -35,4 +32,9 @@ class NaiveBayes(Classifier):
         ROC = self.getROC( X, y, classifier, len(names) )
         ROC["prediction"] = self.getPrediction( X, y, classifier )
         ROC["y_true"] = y
+
+        print "Accuracy for Gini is:", accuracy_score(y, ROC["prediction"]) * 100
+        print(confusion_matrix(y, ROC["prediction"]))
+        print(classification_report(y, ROC["prediction"]))
+
         return ROC

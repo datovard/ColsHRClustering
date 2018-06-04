@@ -6,6 +6,9 @@ from sklearn.preprocessing import label_binarize
 from scipy import interp
 
 class Classifier:
+    def __init__(self, _cv):
+        self.cv = _cv
+
     def getConfusionMatrix(self, classes, y_true, y_pred):
         a = np.zeros(shape=(len(classes), len(classes)), dtype=np.int8)
 
@@ -74,7 +77,7 @@ class Classifier:
 
         # Learn to predict each class against the other
         # Run classifier with cross-validation and plot ROC curves
-        cv = StratifiedKFold(n_splits=6)
+        cv = StratifiedKFold(n_splits=self.cv)
 
         total = []
         tprs = []
@@ -94,5 +97,5 @@ class Classifier:
         return {"total": total, "tprs": tprs, "aucs": aucs, "mean_fpr": mean_fpr}
 
     def getPrediction(self, X, y, classifier):
-        prediction = cross_val_predict( classifier, X, y, cv=10 )
+        prediction = cross_val_predict( classifier, X, y, cv=self.cv )
         return prediction

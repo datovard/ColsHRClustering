@@ -1,12 +1,14 @@
+import numpy as np
 import pandas as pd
 from Preprocessing import Preprocess
 from Discretizing import Discretize
 from Clustering import Cluster
 #from Classifier import Classify
 from Pca import Pca
+
 import matplotlib.pyplot as plt
 import seaborn as sns; sns.set()
-import numpy as np
+
 from sklearn.metrics import accuracy_score, confusion_matrix, roc_curve, auc
 from sklearn.model_selection import train_test_split
 from collections import OrderedDict
@@ -95,26 +97,26 @@ class Main:
         transformator = Transformator( self.dataset )
         data, trans = transformator.run()
 
+        cv = 6
+
         #Bayes Naive
-        bayes = NaiveBayes( data )
-        resp = bayes.run()
+        bayes = NaiveBayes( data, cv )
+        bayes_resp = bayes.run()
 
-        self.plotROCCurves(resp)
-        self.plotConfusionMatrix(resp)
-
-        Y = data['CATEGORIA']
-        # Y = data['CATEGORIA ESPECIFICA']
-
-        # Drop the classifiers
-        data = data.drop(['CATEGORIA ESPECIFICA', 'CATEGORIA'], axis=1)
-        X = data[:]
-
-        # Split 70 to traing and 30 to test
-        X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.3, random_state=random.randint(0, 100))
+        #self.plotROCCurves(resp)
+        #self.plotConfusionMatrix(resp)
 
         #DecisionTree
-        decisionTree = DecisionTree( X_train, X_test, Y_train, Y_test, trans )
-        decisionTree.run()
+        decisionTree = DecisionTree( data, trans, cv )
+        gini_resp = decisionTree.runGini()
+
+        #self.plotROCCurves(gini_resp)
+        #self.plotConfusionMatrix(gini_resp)
+
+        entropy_resp = decisionTree.runEntropy()
+
+        #self.plotROCCurves(entropy_resp)
+        #self.plotConfusionMatrix(entropy_resp)
 
         #NeuralNetwork
         '''neuralNet = NeuralNetwork( X_train, X_test, Y_train, Y_test, trans )
