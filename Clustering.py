@@ -257,23 +257,34 @@ class Cluster:
         print "LISTO"
 
 
-    def startClusteringKPrototypesFullData(self):
+    def startClusteringKPrototypesFullDataHuang(self):
         data = self.dataset
+        cleaned = self.getRemovedDataset()
+
+        folder = "results/clustering/kprototypes/"
+
+        self.fignum = 1
+
+        cleaned['SALARIOS MINIMOS'] = cleaned['SALARIOS MINIMOS'].astype("category").cat.codes.values
+        cleaned['EDAD DEL EMPLEADO'] = cleaned['EDAD DEL EMPLEADO'].astype("category").cat.codes.values
+        cleaned['AFILIADO A PAC'] = cleaned['AFILIADO A PAC'].astype("category").cat.codes.values
 
         categorias = data['CATEGORIA'].astype("category").cat.codes.values
         especificas = data['CATEGORIA ESPECIFICA'].astype("category").cat.codes.values
         data.drop(['CATEGORIA', 'CATEGORIA ESPECIFICA'], axis=1, inplace=True)
+        cleaned.drop(['CATEGORIA', 'CATEGORIA ESPECIFICA'], axis=1, inplace=True)
 
-        keys = list(data)
+        keys = list(cleaned)
         X = data.values
+        C = cleaned.values
+        clusters = []
 
-        for i in xrange( len(keys) ):
-            print keys[i], "\t", X[0][i], "\t", type( X[0][1] )
+        full = list(data)
 
         print "CORRIENDO K-PROTOTYPES CON K = 4"
-        '''k_prot = KPrototypes( n_clusters=4, init='Cao', verbose=0 )
+        k_prot = KPrototypes( n_clusters=4, init='Cao', verbose=0 )
 
-        clusters = k_prot.fit_predict(X, categorical=[0, 1, 2, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 20, 22, 23, 24, 25])
+        clusters = k_prot.fit_predict(X, categorical=range(26))
         centroids = k_prot.cluster_centroids_
 
         bad = 0; good =0
@@ -284,7 +295,7 @@ class Cluster:
                 bad += 1
 
         print good, bad
-        print (float(good)/len(clusters))*100.0, (float(bad)/len(clusters))*100.0'''
+        print (float(good)/len(clusters))*100.0, (float(bad)/len(clusters))*100.0
 
     def daviesbouldin( self, X, labels, centroids ):
         nbre_of_clusters = len(centroids)  # Get the number of clusters
