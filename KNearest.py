@@ -1,27 +1,37 @@
-from sklearn.cross_validation import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import classification_report, confusion_matrix
+from Classifier import Classifier
+from collections import OrderedDict
+from sklearn.multiclass import OneVsRestClassifier
 
-class KNearest:
+class KNearest(Classifier):
 
-    def __init__(self, X_train, X_test, Y_train, Y_test, trans):
+    def __init__(self, _data, _trans, _cv):
+        Classifier.__init__(self, _cv)
+        self.data = _data.copy(deep=True)
+        self.trans = _trans
 
-        self.X_train = X_train.copy(deep=True)
-        self.X_test = X_test.copy(deep=True)
-        self.Y_train = Y_train.copy(deep=True)
-        self.Y_test = Y_test.copy(deep=True)
-        self.Y_pred = []
-        self.trans = trans
+        self.names = list(OrderedDict.fromkeys(self.data['CATEGORIA'].values))
+        self.names.pop(0)
+        self.y = self.data['CATEGORIA'].astype("category").cat.codes.values
+        self.data.drop(['CATEGORIA ESPECIFICA', 'CATEGORIA'], axis=1, inplace=True)
+
+        self.X = self.data.values
 
     def run(self):
-
-        print "K-NEAREST NEIGHTBOOR"
+        print "K-NEAREST NEIGHTBOR"
 
         #K-NEAREST
-        neigh = KNeighborsClassifier(n_neighbors=3)
-        neigh.fit(self.X_train, self.Y_train)
-        self.Y_pred = neigh.predict(self.X_test)
-        print "Accuracy for K-Nearest Neighboor is:", accuracy_score(self.Y_test, self.Y_pred) * 100
-        print(confusion_matrix(self.Y_test, self.Y_pred))
-        print(classification_report(self.Y_test, self.Y_pred))
+        neigh = OneVsRestClassifier(KNeighborsClassifier(n_neighbors=3))
+        ROC = self.getROC(self.X, self.y, neigh, len(self.names))
+        y_pred = self.getPrediction(self.X, self.y, neigh)
+
+        ROC["prediction"] = y_pred
+        ROC["y_true"] = self.y
+
+        print "Accuracy for K-Nearest Neighboor is:", accuracy_score(self.y, y_pred) * 100
+        print(confusion_matrix(self.y, y_pred))
+        print(classification_report(self.y, y_pred))
+
+        return ROC

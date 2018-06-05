@@ -3,7 +3,6 @@ from sklearn.naive_bayes import BernoulliNB
 from sklearn.multiclass import OneVsRestClassifier
 from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
 from collections import OrderedDict
-
 from Classifier import Classifier
 
 class NaiveBayes(Classifier):
@@ -12,29 +11,30 @@ class NaiveBayes(Classifier):
         self.data = _data.copy(deep=True)
         self.cv = _cv
 
-    def run(self):
-        print "BERNOULLI NAIVE BAYES"
-
         erase_vars = ['FECHA INICIO POSESION']
         self.data.drop(erase_vars, axis=1, inplace=True)
 
-        names = list(OrderedDict.fromkeys(self.data['CATEGORIA'].values))
-        names.pop(0)
-        y = self.data['CATEGORIA'].astype("category").cat.codes.values
+        self.names = list(OrderedDict.fromkeys(self.data['CATEGORIA'].values))
+        self.names.pop(0)
+        self.y = self.data['CATEGORIA'].astype("category").cat.codes.values
         self.data.drop(['CATEGORIA ESPECIFICA', 'CATEGORIA'], axis=1, inplace=True)
 
         self.data = pd.get_dummies(self.data)
 
-        X = self.data.values
+        self.X = self.data.values
 
-        classifier = OneVsRestClassifier(BernoulliNB())
+    def run(self):
+        print "BERNOULLI NAIVE BAYES"
 
-        ROC = self.getROC( X, y, classifier, len(names) )
-        ROC["prediction"] = self.getPrediction( X, y, classifier )
-        ROC["y_true"] = y
+        clr_nb = OneVsRestClassifier(BernoulliNB())
+        ROC = self.getROC( self.X, self.y, clr_nb, len(self.names) )
+        y_pred = self.getPrediction( self.X, self.y, clr_nb )
 
-        print "Accuracy for Gini is:", accuracy_score(y, ROC["prediction"]) * 100
-        print(confusion_matrix(y, ROC["prediction"]))
-        print(classification_report(y, ROC["prediction"]))
+        ROC["prediction"] = y_pred
+        ROC["y_true"] = self.y
+
+        print "Accuracy for Gini is:", accuracy_score(self.y, y_pred) * 100
+        print(confusion_matrix(self.y, y_pred))
+        print(classification_report(self.y, y_pred))
 
         return ROC

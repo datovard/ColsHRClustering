@@ -28,13 +28,12 @@ class Main:
         self.dataset = pd.read_csv(file, index_col=False, header=0, delimiter="\t")
         self.start()
 
-    def plotROCCurves(self, data):
+    def addPlotROCCurves(self, data, nrows, ncols, index, title):
         total = data["total"]
         tprs = data["tprs"]
         aucs = data["aucs"]
         mean_fpr = data["mean_fpr"]
 
-        plt.clf()
         for i in xrange(len(total)):
             fpr = total[i][0]
             tpr = total[i][1]
@@ -44,6 +43,7 @@ class Main:
 
             i += 1
 
+        plt.subplot(nrows, ncols, index)
         plt.plot([0, 1], [0, 1], linestyle='--', lw=2, color='r',
                  label='Luck', alpha=.8)
 
@@ -64,22 +64,24 @@ class Main:
 
         plt.xlim([-0.05, 1.05])
         plt.ylim([-0.05, 1.05])
-        plt.xlabel('False Positive Rate')
-        plt.ylabel('True Positive Rate')
-        plt.title('Receiver operating characteristic example')
+        plt.title(title)
         plt.legend(loc="lower right")
+        #plt.show()
+
+    def showPlotCurves(self):
         plt.show()
 
-    def plotConfusionMatrix(self, data):
+    def plotConfusionMatrix(self, data, nrows, ncols, index, title):
         y_true = data["y_true"]
         prediction = data["prediction"]
 
+        plt.subplot(nrows, ncols, index)
         mat = confusion_matrix(y_true, prediction)
         sns.heatmap(mat.T, square=True, annot=True, fmt='d', cbar=True,
-                    xticklabels=self.names, yticklabels=self.names)
+                    xticklabels=map(lambda x: x[0], self.names), yticklabels=map(lambda x: x[0],self.names))
         plt.xlabel('Verdaderos (Accuracy: '+str(accuracy_score(y_true, prediction) * 100)[:6]+'% )')
-        plt.ylabel('Predecidos');
-        plt.show()
+        plt.ylabel('Predecidos')
+        plt.title(title)
 
     def start(self):
         #Preprocessing
@@ -90,45 +92,7 @@ class Main:
         discretize = Discretize( self.dataset, False )
         self.dataset = discretize.discretizeFile()
 
-        self.names = list(OrderedDict.fromkeys(self.dataset['CATEGORIA'].values))
-        self.names.pop(0)
-
-        #Transform data
-        transformator = Transformator( self.dataset )
-        data, trans = transformator.run()
-
-        cv = 6
-
-        #Bayes Naive
-        bayes = NaiveBayes( data, cv )
-        bayes_resp = bayes.run()
-
-        #self.plotROCCurves(resp)
-        #self.plotConfusionMatrix(resp)
-
-        #DecisionTree
-        decisionTree = DecisionTree( data, trans, cv )
-        gini_resp = decisionTree.runGini()
-
-        #self.plotROCCurves(gini_resp)
-        #self.plotConfusionMatrix(gini_resp)
-
-        entropy_resp = decisionTree.runEntropy()
-
-        #self.plotROCCurves(entropy_resp)
-        #self.plotConfusionMatrix(entropy_resp)
-
-        #NeuralNetwork
-        '''neuralNet = NeuralNetwork( X_train, X_test, Y_train, Y_test, trans )
-        neuralNet.run()
-
-        #SVM
-        svm = SupportVectorMachine( X_train, X_test, Y_train, Y_test, trans )
-        svm.run()
-
-        #K-Nearest
-        neigh = KNearest( X_train, X_test, Y_train, Y_test, trans )
-        neigh.run()'''
+        self.runClustering()
 
         #Cluster
         # cluster = Cluster( self.dataset )
@@ -150,6 +114,60 @@ class Main:
         #PCA
         # pca = Pca( self.dataset )
         # pca.pca_process()
+
+    def runClustering(self):
+        self.names = list(OrderedDict.fromkeys(self.dataset['CATEGORIA'].values))
+        self.names.pop(0)
+
+        # Transform data
+        transformator = Transformator(self.dataset)
+        data, trans = transformator.run()
+
+        cv = 6
+
+        # Bayes Naive
+        bayes = NaiveBayes(data, cv)
+        bayes_resp = bayes.run()
+
+        # DecisionTree
+        decisionTree = DecisionTree(data, trans, cv)
+        gini_resp = decisionTree.runGini()
+        entropy_resp = decisionTree.runEntropy()
+
+        # NeuralNetwork
+        neuralNet = NeuralNetwork(data, trans, cv)
+        nn_resp = neuralNet.run()
+
+        # SVM
+        svm = SupportVectorMachine(data, trans, cv)
+        svm_resp = svm.run()
+
+        # K-Nearest
+        neigh = KNearest(data, trans, cv)
+        neigh_resp = neigh.run()
+
+        plt.clf()
+        self.addPlotROCCurves(bayes_resp, 2, 3, 1, "Bernoulli NB")
+        plt.ylabel('True Positive Rate')
+        self.addPlotROCCurves(gini_resp, 2, 3, 2, "Gini DT")
+        self.addPlotROCCurves(entropy_resp, 2, 3, 3, "Entropy DT")
+        self.addPlotROCCurves(nn_resp, 2, 3, 4, "Neural net")
+        plt.ylabel('True Positive Rate')
+        self.addPlotROCCurves(svm_resp, 2, 3, 5, "SVM")
+        plt.xlabel('False Positive Rate')
+        self.addPlotROCCurves(neigh_resp, 2, 3, 6, "KNN")
+
+        self.showPlotCurves()
+
+        plt.clf()
+        self.plotConfusionMatrix(bayes_resp, 2, 3, 1, "Bernoulli NB")
+        self.plotConfusionMatrix(gini_resp, 2, 3, 2, "Gini DT")
+        self.plotConfusionMatrix(entropy_resp, 2, 3, 3, "Entropy DT")
+        self.plotConfusionMatrix(nn_resp, 2, 3, 4, "Neural net")
+        self.plotConfusionMatrix(svm_resp, 2, 3, 5, "SVM")
+        self.plotConfusionMatrix(neigh_resp, 2, 3, 6, "KNN")
+
+        self.showPlotCurves()
 
 file = 'files/database.csv'
 

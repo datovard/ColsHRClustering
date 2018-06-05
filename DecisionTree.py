@@ -16,9 +16,6 @@ class DecisionTree(Classifier):
         self.data = _data.copy(deep=True)
         self.trans = _trans
 
-        erase_vars = ['FECHA INICIO POSESION']
-        self.data.drop(erase_vars, axis=1, inplace=True)
-
         self.names = list(OrderedDict.fromkeys(self.data['CATEGORIA'].values))
         self.y = self.data['CATEGORIA'].astype("category").cat.codes.values
         self.data.drop(['CATEGORIA ESPECIFICA', 'CATEGORIA'], axis=1, inplace=True)
