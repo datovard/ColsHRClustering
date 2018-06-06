@@ -1,10 +1,15 @@
+from __future__ import division, print_function
 import numpy as np
 import pandas as pd
 from Preprocessing import Preprocess
 from Discretizing import Discretize
+from Association import Association
 from Clustering import Cluster
 #from Classifier import Classify
 from Pca import Pca
+import pandas as pd
+import numpy as np
+import itertools
 
 import matplotlib.pyplot as plt
 import seaborn as sns; sns.set()
@@ -19,6 +24,8 @@ from DecisionTree import DecisionTree
 from NeuralNetwork import NeuralNetwork
 from SupportVectorMachine import SupportVectorMachine
 from KNearest import KNearest
+
+import weka.core.jvm as jvm
 
 import random
 
@@ -92,7 +99,17 @@ class Main:
         discretize = Discretize( self.dataset, False )
         self.dataset = discretize.discretizeFile()
 
-        self.runClustering()
+        #Association
+        association = Association( self.dataset )
+        keys = ["HORAS AL MES", "DIVISION", "AREA DE PERSONAL", "SEXO", "EDAD DEL EMPLEADO", "SALARIOS MINIMOS", "CATEGORIA"]
+        association.apriori(keys, confidence=0.7)
+        association.filteredApriori(keys, confidence=0.7)
+
+        jvm.stop()
+
+
+
+        #self.runClustering()
 
         #Cluster
         # cluster = Cluster( self.dataset )
