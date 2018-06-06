@@ -10,7 +10,6 @@ import matplotlib.pyplot as plt
 import seaborn as sns; sns.set()
 
 from sklearn.metrics import accuracy_score, confusion_matrix, roc_curve, auc
-from sklearn.model_selection import train_test_split
 from collections import OrderedDict
 
 from Transformator import Transformator
@@ -19,8 +18,6 @@ from DecisionTree import DecisionTree
 from NeuralNetwork import NeuralNetwork
 from SupportVectorMachine import SupportVectorMachine
 from KNearest import KNearest
-
-import random
 
 class Main:
 
@@ -92,7 +89,7 @@ class Main:
         discretize = Discretize( self.dataset, False )
         self.dataset = discretize.discretizeFile()
 
-        self.runClustering()
+        self.runClassifiers()
 
         #Cluster
         # cluster = Cluster( self.dataset )
@@ -115,7 +112,7 @@ class Main:
         # pca = Pca( self.dataset )
         # pca.pca_process()
 
-    def runClustering(self):
+    def runClassifiers(self):
         self.names = list(OrderedDict.fromkeys(self.dataset['CATEGORIA'].values))
         self.names.pop(0)
 
