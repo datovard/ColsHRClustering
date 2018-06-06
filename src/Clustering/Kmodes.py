@@ -45,6 +45,12 @@ class Kmodes(Cluster):
 
             print "\tError cuadratico:", k_modes.cost_
             print "\t# iteraciones:", k_modes.n_iter_
+
+            scores = self.getScores( categorias, labels )
+            print "\tHomogeneidad:", scores[0]
+            print "\tCompletitud:", scores[1]
+            print "\tV-score:", scores[2]
+
             errors.append(k_modes.cost_)
 
             index_pos += 1
@@ -99,6 +105,12 @@ class Kmodes(Cluster):
 
             print "\tError cuadratico:", k_modes.cost_
             print "\t# iteraciones:", k_modes.n_iter_
+
+            scores = self.getScores( categorias, labels )
+            print "\tHomogeneidad:", scores[0]
+            print "\tCompletitud:", scores[1]
+            print "\tV-score:", scores[2]
+
             errors.append(k_modes.cost_)
             index_pos += 1
             self.plotCluster(C, labels, keys, "K = " + str(i), [2,4,index_pos])

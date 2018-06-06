@@ -99,6 +99,11 @@ class Kprototypes(Cluster):
 
             print "\tError cuadratico:", k_proto.cost_
             print "\t# iteraciones:", k_proto.n_iter_
+            scores = self.getScores( categorias, labels )
+            print "\tHomogeneidad:", scores[0]
+            print "\tCompletitud:", scores[1]
+            print "\tV-score:", scores[2]
+
             errors.append(k_proto.cost_)
 
             index_pos += 1

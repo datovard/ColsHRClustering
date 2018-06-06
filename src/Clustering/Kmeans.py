@@ -74,7 +74,11 @@ class Kmeans(Cluster):
             print "\tError cuadratico:", kmeans.inertia_
             errors.append(kmeans.inertia_)
             dbIndex = self.daviesbouldin(X, labels, centers)
+            scores = self.getScores( categorias, labels )
             print "\tIndice Davies-Bouldin:", dbIndex
+            print "\tHomogeneidad:", scores[0]
+            print "\tCompletitud:", scores[1]
+            print "\tV-score:", scores[2]
 
             dbindexes.append(dbIndex)
 

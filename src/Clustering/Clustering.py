@@ -1,10 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from sklearn.metrics import homogeneity_score, completeness_score, v_measure_score
 from mpl_toolkits.mplot3d import Axes3D
-
-from sklearn.cluster import KMeans
-from scipy.spatial.distance import pdist, euclidean
-from kmodes.kprototypes import KPrototypes
 
 
 class Cluster:
@@ -12,10 +9,10 @@ class Cluster:
         self.startPlotCluster()
 
     def startPlotCluster(self, ):
-        self.fig = plt.figure(1)
+        self.fig = plt.figure(figsize=(10,7))
 
     def plotCluster(self, data, labels, keys, title, subplot ):
-        ax = self.fig.add_subplot(subplot[0], subplot[1], subplot[2], projection="3d") #Axes3D(fig, rect=[0, 0, 1, 1], elev=48, azim=134)
+        ax = self.fig.add_subplot(subplot[0], subplot[1], subplot[2], projection="3d")
 
         ax.scatter(data[:, 0], data[:, 1], data[:, 2], c=labels.astype(np.float), edgecolor='k', s=50 )
 
@@ -48,3 +45,6 @@ class Cluster:
         plt.clf()
         plt.cla()
         plt.close()
+
+    def getScores(self, y_true, y_pred):
+        return [homogeneity_score(y_true, y_pred), completeness_score(y_true, y_pred), v_measure_score(y_true, y_pred)]

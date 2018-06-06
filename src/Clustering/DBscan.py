@@ -49,7 +49,12 @@ class DBscan(Cluster):
         print "IMPRIMIENDO LAS 3 MEJORES EJECUCIONES SEGUN V-SCORE"
         for i in xrange(3):
             index_pos += 1
-            print "V-SCORE "+str(i+1)+":", str(results[i][2])+",", "eps = "+str(results[i][1][0])+" samples = "+str(results[i][1][1])
+            print "DBScan "+str(i+1)
+            print "\tParametros:", "eps = "+str(results[i][1][0])+" samples = "+str(results[i][1][1])
+            scores = self.getScores( categorias, results[i][0] )
+            print "\tHomogeneidad:", scores[0]
+            print "\tCompletitud:", scores[1]
+            print "\tV-score:", scores[2]
             self.plotCluster(X, results[i][0], keys, "DBSCAN = " + str(i+1), [2, 2, index_pos])
 
         self.showPlot()
