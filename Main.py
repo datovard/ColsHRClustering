@@ -1,33 +1,30 @@
 from __future__ import division, print_function
 import numpy as np
 import pandas as pd
-from Preprocessing import Preprocess
-from Discretizing import Discretize
-from Association import Association
-from Clustering import Cluster
 #from Classifier import Classify
-from Pca import Pca
 import pandas as pd
 import numpy as np
 import itertools
-
 import matplotlib.pyplot as plt
 import seaborn as sns; sns.set()
-
-from sklearn.metrics import accuracy_score, confusion_matrix, roc_curve, auc
-from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score, confusion_matrix, auc
 from collections import OrderedDict
 
-from Transformator import Transformator
-from NaiveBayes import NaiveBayes
-from DecisionTree import DecisionTree
-from NeuralNetwork import NeuralNetwork
-from SupportVectorMachine import SupportVectorMachine
-from KNearest import KNearest
+from src.Preprocessing.Preprocessing import Preprocess
+from src.Preprocessing.Discretizing import Discretize
+from src.Association.Association import Association
+from src.Clustering.Clustering import Cluster
+from src.Clustering.Kmeans import Kmeans
+from src.Clustering.Kmodes import Kmodes
 
+from src.Transformator import Transformator
+from src.Classifying.NaiveBayes import NaiveBayes
+from src.Classifying.DecisionTree import DecisionTree
+from src.Classifying.NeuralNetwork import NeuralNetwork
+from src.Classifying.SupportVectorMachine import SupportVectorMachine
+from src.Classifying.KNearest import KNearest
 import weka.core.jvm as jvm
 
-import random
 
 class Main:
 
@@ -95,24 +92,25 @@ class Main:
         preprocess = Preprocess( self.dataset )
         self.dataset = preprocess.preprocessFile()
 
+        #kmeans = Kmeans(self.dataset)
+        #kmeans.run()
+
         #Discretize
         discretize = Discretize( self.dataset, False )
         self.dataset = discretize.discretizeFile()
 
-        #Association
-        association = Association( self.dataset )
-        keys = ["HORAS AL MES", "DIVISION", "AREA DE PERSONAL", "SEXO", "EDAD DEL EMPLEADO", "SALARIOS MINIMOS", "CATEGORIA"]
+        # Association
+        association = Association(self.dataset)
+        keys = ["HORAS AL MES", "DIVISION", "AREA DE PERSONAL", "SEXO", "EDAD DEL EMPLEADO", "SALARIOS MINIMOS",
+                "CATEGORIA"]
         association.apriori(keys, confidence=0.7)
         association.filteredApriori(keys, confidence=0.7)
-
         jvm.stop()
 
+        kmodes = Kmodes(self.dataset)
+        # kmodes.startClusteringKModesFullDataHuang()
+        kmodes.startClusteringKModesFullDataCao()
 
-
-        #self.runClustering()
-
-        #Cluster
-        # cluster = Cluster( self.dataset )
         # cluster.startClusteringKMeans()
 
         # cluster.startClusteringKModesFullDataHuang()
@@ -128,11 +126,14 @@ class Main:
         # cluster2.startClusteringKModesFullDataHuang()
         # cluster2.startClusteringKModesFullDataCao()
 
+        # Classifying
+        # self.runClassifiers()
+
         #PCA
         # pca = Pca( self.dataset )
         # pca.pca_process()
 
-    def runClustering(self):
+    def runClassifiers(self):
         self.names = list(OrderedDict.fromkeys(self.dataset['CATEGORIA'].values))
         self.names.pop(0)
 
