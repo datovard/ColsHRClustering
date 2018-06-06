@@ -6,6 +6,7 @@ from src.Preprocessing.Discretizing import Discretize
 
 #from src.Association.Association import Association
 from src.Clustering.Kmeans import Kmeans
+from src.Clustering.DBscan import DBscan
 from src.Clustering.Kmodes import Kmodes
 from src.Clustering.Kprototypes import Kprototypes
 
@@ -32,6 +33,9 @@ class Main:
         #kprototypes.startClusteringKPrototypesHuang()
         #kprototypes.startClusteringKPrototypesCao()
 
+        dbscan = DBscan(self.dataset)
+        dbscan.run()
+
         #Discretize
         discretize = Discretize( self.dataset, False )
         self.dataset = discretize.discretizeFile()
@@ -46,11 +50,11 @@ class Main:
                 "CATEGORIA"]
         association.apriori(keys, confidence=0.7)
         association.filteredApriori(keys, confidence=0.7)
-        jvm.stop()'''
+        jvm.stop()
 
         # Classifying
         classifier = Runner(self.dataset)
-        classifier.runClassifiers()
+        classifier.runClassifiers()'''
 
         #PCA
         # pca = Pca( self.dataset )

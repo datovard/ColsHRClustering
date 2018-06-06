@@ -12,7 +12,7 @@ class Cluster:
         self.startPlotCluster()
 
     def startPlotCluster(self):
-        self.fig = plt.figure(1, figsize=(8, 7))
+        self.fig = plt.figure(1)
 
     def plotCluster(self, data, labels, keys, title, subplot ):
         ax = self.fig.add_subplot(subplot[0], subplot[1], subplot[2], projection="3d") #Axes3D(fig, rect=[0, 0, 1, 1], elev=48, azim=134)

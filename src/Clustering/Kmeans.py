@@ -43,18 +43,12 @@ class Kmeans(Cluster):
     def run(self):
         data = self.getRemovedDataset()
 
-        # data['AFILIADO A PAC'] = map(lambda x: 0 if x == 1 else 1, data['AFILIADO A PAC'])
-
-        self.fignum = 1
-
         categorias = data['CATEGORIA'].astype("category").cat.codes.values
         especificas = data['CATEGORIA ESPECIFICA'].astype("category").cat.codes.values
         data.drop(['CATEGORIA', 'CATEGORIA ESPECIFICA'], axis=1, inplace=True)
 
         keys = list(data)
         X = data.values
-
-        folder = "results/clustering/kmeans/"
 
         clusters = []
         index_pos = 1
@@ -69,11 +63,6 @@ class Kmeans(Cluster):
         print "CALCULANDO EJECUCIONES K MEANS"
         errors = []
         dbindexes = []
-        file = open(folder + "/results.txt", "w+")
-        file.write("Resultados ejecucion K-means\n\n")
-
-        file.write("Variables:\n")
-        file.write(str(keys) + "\n\n")
 
         for i, kmeans in clusters:
             print "CALCULANDO K =", i
@@ -89,16 +78,11 @@ class Kmeans(Cluster):
 
             dbindexes.append(dbIndex)
 
-            file.write("K = " + str(i) + "\n")
-            file.write("\tSuma de distancias cuadradas: " + str(kmeans.inertia_) + "\n")
-            file.write("\tIndice Davies-Bouldin: " + str(dbIndex) + "\n\n")
-
             index_pos += 1
             self.plotCluster(X, labels, keys, "K = " + str(len(centers)), [2,4,index_pos] )
         print "LISTO"
 
         self.showPlot()
-        file.close()
 
         print "GRAFICANDO INDICES"
         k_X = np.array(xrange(3, self.maxK + 1))

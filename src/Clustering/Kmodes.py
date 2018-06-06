@@ -1,7 +1,9 @@
 import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
 from kmodes.kmodes import KModes
 from Clustering import Cluster
+from sklearn.metrics import confusion_matrix, accuracy_score
 
 class Kmodes(Cluster):
     def __init__(self, _dataset):
@@ -29,10 +31,19 @@ class Kmodes(Cluster):
 
         plt.clf()
         print "IMPRIMIENDO CLASIFICACION CORRECTA"
-        self.plotCluster(C, categorias, keys, "Clasificacion Original", [2, 4, index_pos])
+        self.plotCluster(C, categorias, keys, "Clasificacion Original", [1, 2, index_pos])
         print "LISTO"
 
-        for i in xrange(3, self.maxK + 1):
+        kmode = KModes(n_clusters=4, init='Huang', verbose=0)
+        labels = kmode.fit_predict(X)
+
+        self.plotCluster(C, labels, keys, "K = 4", [1, 2, 2])
+
+        print accuracy_score(categorias, labels)
+        print confusion_matrix(categorias, labels)
+        self.showPlot()
+
+        '''for i in xrange(3, self.maxK + 1):
             clusters.append((i, KModes(n_clusters=i, init='Huang', verbose=0)))
 
         print "CALCULANDO EJECUCIONES K-MODES HUANG"
@@ -61,9 +72,10 @@ class Kmodes(Cluster):
         plt.xlabel("# de clusters (k)")
         plt.ylabel("Suma de distancias cuadradas")
         self.showPlot()
-        print "LISTO"
+        print "LISTO"'''
 
     def startClusteringKModesFullDataCao(self):
+        self.startPlotCluster()
         data = self.dataset.copy(deep=True)
         cleaned = self.getRemovedDataset()
 
