@@ -33,7 +33,7 @@ class NaiveBayes(Classifier):
         ROC["prediction"] = y_pred
         ROC["y_true"] = self.y
 
-        print "Accuracy for Gini is:", accuracy_score(self.y, y_pred) * 100
+        print "Accuracy for Bernoulli Naive Bayes is:", accuracy_score(self.y, y_pred) * 100
         print(confusion_matrix(self.y, y_pred))
         print(classification_report(self.y, y_pred))
 
