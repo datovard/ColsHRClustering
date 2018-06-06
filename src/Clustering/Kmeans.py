@@ -10,20 +10,6 @@ class Kmeans(Cluster):
         self.dataset = _dataset.copy(deep=True)
         self.maxK = 9
 
-    def getRemovedDataset(self):
-        data = self.dataset.copy(deep=True)
-        erase_vars = [ 'FECHA INICIO POSESION', 'TURNO', 'HORAS AL MES', 'HORARIO TRABAJO',
-                      'GRUPO PERSONAL', 'CLASE DE CONTRATO', 'RELACION LABORAL', 'TIPO DE PACTO',
-                      'AREA DE NOMINA', 'CENTRO DE COSTE',
-                      'DIVISION', 'DIVISION PERSONAL', 'SUBDIVISION PERSONAL', 'AREA DE PERSONAL', 'SEXO',
-                      'ROL DEL EMPLEADO', 'TIPO DE PACTO ESPECIFICO', 'FAMILIAR AFILIADO A PAC',
-                      'ES AFILIADO A PAC O TIENE AFILIADO A UN FAMILIAR']
-
-        data = self.dataset.drop(erase_vars, axis=1)
-        data = data[[ 'EDAD DEL EMPLEADO', 'SALARIOS MINIMOS', 'AFILIADO A PAC', 'CATEGORIA ESPECIFICA', 'CATEGORIA']]
-
-        return data
-
     def daviesbouldin( self, X, labels, centroids ):
         nbre_of_clusters = len(centroids)  # Get the number of clusters
         distances = [[] for e in range(nbre_of_clusters)]  # Store intra-cluster distances by cluster
@@ -57,18 +43,12 @@ class Kmeans(Cluster):
     def run(self):
         data = self.getRemovedDataset()
 
-        # data['AFILIADO A PAC'] = map(lambda x: 0 if x == 1 else 1, data['AFILIADO A PAC'])
-
-        self.fignum = 1
-
         categorias = data['CATEGORIA'].astype("category").cat.codes.values
         especificas = data['CATEGORIA ESPECIFICA'].astype("category").cat.codes.values
         data.drop(['CATEGORIA', 'CATEGORIA ESPECIFICA'], axis=1, inplace=True)
 
         keys = list(data)
         X = data.values
-
-        folder = "results/clustering/kmeans/"
 
         clusters = []
         index_pos = 1
@@ -83,11 +63,6 @@ class Kmeans(Cluster):
         print "CALCULANDO EJECUCIONES K MEANS"
         errors = []
         dbindexes = []
-        file = open(folder + "/results.txt", "w+")
-        file.write("Resultados ejecucion K-means\n\n")
-
-        file.write("Variables:\n")
-        file.write(str(keys) + "\n\n")
 
         for i, kmeans in clusters:
             print "CALCULANDO K =", i
@@ -103,16 +78,11 @@ class Kmeans(Cluster):
 
             dbindexes.append(dbIndex)
 
-            file.write("K = " + str(i) + "\n")
-            file.write("\tSuma de distancias cuadradas: " + str(kmeans.inertia_) + "\n")
-            file.write("\tIndice Davies-Bouldin: " + str(dbIndex) + "\n\n")
-
             index_pos += 1
             self.plotCluster(X, labels, keys, "K = " + str(len(centers)), [2,4,index_pos] )
         print "LISTO"
 
-        plt.show()
-        file.close()
+        self.showPlot()
 
         print "GRAFICANDO INDICES"
         k_X = np.array(xrange(3, self.maxK + 1))
@@ -122,12 +92,10 @@ class Kmeans(Cluster):
         plt.plot(k_X, sse_Y, '-o')
         plt.xlabel("# de clusters (k)")
         plt.ylabel("Suma de distancias cuadradas")
-        plt.savefig(folder + "Suma distancias.png")
-        plt.clf()
+        self.showPlot()
 
         plt.plot(k_X, db_Y, '-o')
         plt.xlabel("# de clusters (k)")
         plt.ylabel("Indice Davies-Bouldin")
-        plt.show()
-        plt.clf()
+        self.showPlot()
         print "LISTO"

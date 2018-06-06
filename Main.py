@@ -1,19 +1,18 @@
 from __future__ import division, print_function
-import numpy as np
-import pandas as pd
-import pandas as pd
-import numpy as np
-import itertools
-import matplotlib.pyplot as plt
 import seaborn as sns; sns.set()
-
+import pandas as pd
 from src.Preprocessing.Preprocessing import Preprocess
 from src.Preprocessing.Discretizing import Discretize
-from src.Association.Association import Association
+
+#from src.Association.Association import Association
+from src.Clustering.Kmeans import Kmeans
+from src.Clustering.DBscan import DBscan
 from src.Clustering.Kmodes import Kmodes
+from src.Clustering.Kprototypes import Kprototypes
+
 from src.Classifying.Runner import Runner
 
-import weka.core.jvm as jvm
+#import weka.core.jvm as jvm
 
 
 class Main:
@@ -30,40 +29,32 @@ class Main:
         #kmeans = Kmeans(self.dataset)
         #kmeans.run()
 
+        #kprototypes = Kprototypes(self.dataset)
+        #kprototypes.startClusteringKPrototypesHuang()
+        #kprototypes.startClusteringKPrototypesCao()
+
+        dbscan = DBscan(self.dataset)
+        dbscan.run()
+
         #Discretize
         discretize = Discretize( self.dataset, False )
         self.dataset = discretize.discretizeFile()
 
+        #kmodes = Kmodes(self.dataset)
+        #kmodes.startClusteringKModesFullDataHuang()
+        #kmodes.startClusteringKModesFullDataCao()
+
         # Association
-        association = Association(self.dataset)
+        '''association = Association(self.dataset)
         keys = ["HORAS AL MES", "DIVISION", "AREA DE PERSONAL", "SEXO", "EDAD DEL EMPLEADO", "SALARIOS MINIMOS",
                 "CATEGORIA"]
         association.apriori(keys, confidence=0.7)
         association.filteredApriori(keys, confidence=0.7)
         jvm.stop()
 
-        kmodes = Kmodes(self.dataset)
-        # kmodes.startClusteringKModesFullDataHuang()
-        kmodes.startClusteringKModesFullDataCao()
-
-        # cluster.startClusteringKMeans()
-
-        # cluster.startClusteringKModesFullDataHuang()
-        # cluster.startClusteringKModesFullDataCao()
-
-        # cluster.startClusteringKPrototypesFullData()
-        # cluster.startClusteringKPrototypesMinData()
-
-        # cluster1 = Cluster(self.dataset)
-        # cluster1.startClusteringKMeans()
-
-        # cluster2 = Cluster(self.dataset)
-        # cluster2.startClusteringKModesFullDataHuang()
-        # cluster2.startClusteringKModesFullDataCao()
-
         # Classifying
         classifier = Runner(self.dataset)
-        classifier.runClassifiers()
+        classifier.runClassifiers()'''
 
         #PCA
         # pca = Pca( self.dataset )

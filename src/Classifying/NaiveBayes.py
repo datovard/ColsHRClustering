@@ -11,9 +11,6 @@ class NaiveBayes(Classifier):
         self.data = _data.copy(deep=True)
         self.cv = _cv
 
-        erase_vars = ['FECHA INICIO POSESION']
-        self.data.drop(erase_vars, axis=1, inplace=True)
-
         self.names = list(OrderedDict.fromkeys(self.data['CATEGORIA'].values))
         self.names.pop(0)
         self.y = self.data['CATEGORIA'].astype("category").cat.codes.values

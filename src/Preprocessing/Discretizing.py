@@ -185,14 +185,14 @@ class Discretize:
         data["FAMILIAR AFILIADO A PAC"] = column
 
         # Discretize Initial Date
-        column = data["FECHA INICIO POSESION"]
+        '''column = data["FECHA INICIO POSESION"]
         bins_dt = pd.date_range('2005-01-01', freq='1AS', periods=15)
         bins_str = bins_dt.astype(str).values
         labels = ['({}, {}]'.format(bins_str[i - 1], bins_str[i]) for i in range(1, len(bins_str))]
         column = pd.cut(column.astype(np.int64) // 10 ** 9, bins=bins_dt.astype(np.int64) // 10 ** 9, labels=labels)
         column.values.value_counts().plot(kind='bar', title="FECHA INICIO POSESION", figsize=(8, 6))
         #if self.flag: self.savePlot(folder + "FECHA INICIO POSESION.png", 0.4)
-        data["FECHA INICIO POSESION"] = column
+        data["FECHA INICIO POSESION"] = column'''
 
         """
         # Discretize Primera Alta
