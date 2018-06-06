@@ -1,23 +1,18 @@
 import numpy as np
 import pandas as pd
-from Preprocessing import Preprocess
-from Discretizing import Discretize
-from Clustering import Cluster
-#from Classifier import Classify
-from Pca import Pca
-
 import matplotlib.pyplot as plt
 import seaborn as sns; sns.set()
-
-from sklearn.metrics import accuracy_score, confusion_matrix, roc_curve, auc
+from sklearn.metrics import accuracy_score, confusion_matrix, auc
 from collections import OrderedDict
 
-from Transformator import Transformator
-from NaiveBayes import NaiveBayes
-from DecisionTree import DecisionTree
-from NeuralNetwork import NeuralNetwork
-from SupportVectorMachine import SupportVectorMachine
-from KNearest import KNearest
+from src.Transformator import Transformator
+from src.Classifying.NaiveBayes import NaiveBayes
+from src.Classifying.DecisionTree import DecisionTree
+from src.Classifying.NeuralNetwork import NeuralNetwork
+from src.Classifying.SupportVectorMachine import SupportVectorMachine
+from src.Classifying.KNearest import KNearest
+from src.Preprocessing.Preprocessing import Preprocess
+from src.Preprocessing.Discretizing import Discretize
 
 class Main:
 
@@ -89,6 +84,8 @@ class Main:
         discretize = Discretize( self.dataset, False )
         self.dataset = discretize.discretizeFile()
 
+
+        #Classifying
         self.runClassifiers()
 
         #Cluster

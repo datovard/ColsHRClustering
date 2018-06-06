@@ -1,7 +1,7 @@
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import classification_report, confusion_matrix
-from Classifier import Classifier
+from src.Classifying.Classifier import Classifier
 from collections import OrderedDict
 from sklearn.multiclass import OneVsRestClassifier
 
