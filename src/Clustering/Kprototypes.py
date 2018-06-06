@@ -1,15 +1,15 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from kmodes.kmodes import KModes
+from kmodes.kprototypes import KPrototypes
 from Clustering import Cluster
 
-class Kmodes(Cluster):
+class Kprototypes(Cluster):
     def __init__(self, _dataset):
         Cluster.__init__(self)
         self.dataset = _dataset.copy(deep=True)
         self.maxK = 9
 
-    def startClusteringKModesFullDataHuang(self):
+    def startClusteringKPrototypesHuang(self):
         data = self.dataset.copy(deep=True)
         cleaned = self.getRemovedDataset()
 
@@ -33,22 +33,22 @@ class Kmodes(Cluster):
         print "LISTO"
 
         for i in xrange(3, self.maxK + 1):
-            clusters.append((i, KModes(n_clusters=i, init='Huang', verbose=0)))
+            clusters.append((i, KPrototypes(n_clusters=i, init='Huang', verbose=0)))
 
-        print "CALCULANDO EJECUCIONES K-MODES HUANG"
+        print "CALCULANDO EJECUCIONES K-PROTOTYPES HUANG"
         errors = []
+        categorical = [0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 15, 16]
 
-        for i, k_modes in clusters:
+        for i, k_proto in clusters:
             print "CALCULANDO K =", i
-            labels = k_modes.fit_predict(X)
-            centers = k_modes.cluster_centroids_
+            labels = k_proto.fit_predict(X, categorical=categorical)
 
-            print "\tError cuadratico:", k_modes.cost_
-            print "\t# iteraciones:", k_modes.n_iter_
-            errors.append(k_modes.cost_)
+            print "\tError cuadratico:", k_proto.cost_
+            print "\t# iteraciones:", k_proto.n_iter_
+            errors.append(k_proto.cost_)
 
             index_pos += 1
-            self.plotCluster(C, labels, keys, "K = " + str(len(centers)), [2,4,index_pos])
+            self.plotCluster(C, labels, keys, "K = " + str(i), [2,4,index_pos])
         print "LISTO"
 
         self.showPlot()
@@ -63,7 +63,7 @@ class Kmodes(Cluster):
         self.showPlot()
         print "LISTO"
 
-    def startClusteringKModesFullDataCao(self):
+    def startClusteringKPrototypesCao(self):
         data = self.dataset.copy(deep=True)
         cleaned = self.getRemovedDataset()
 
@@ -72,7 +72,6 @@ class Kmodes(Cluster):
         cleaned['AFILIADO A PAC'] = cleaned['AFILIADO A PAC'].astype("category").cat.codes.values
 
         categorias = data['CATEGORIA'].astype("category").cat.codes.values
-        especificas = data['CATEGORIA ESPECIFICA'].astype("category").cat.codes.values
         data.drop(['CATEGORIA', 'CATEGORIA ESPECIFICA'], axis=1, inplace=True)
         cleaned.drop(['CATEGORIA', 'CATEGORIA ESPECIFICA'], axis=1, inplace=True)
 
@@ -80,26 +79,28 @@ class Kmodes(Cluster):
         X = data.values
         C = cleaned.values
         clusters = []
-
         index_pos = 1
+
         plt.clf()
         print "IMPRIMIENDO CLASIFICACION CORRECTA"
-        self.plotCluster(C, categorias, keys, "Clasificacion Original", [2,4,index_pos])
+        self.plotCluster(C, categorias, keys, "Clasificacion Original", [2, 4, index_pos])
         print "LISTO"
 
         for i in xrange(3, self.maxK + 1):
-            clusters.append((i, KModes(n_clusters=i, init='Cao', verbose=0)))
+            clusters.append((i, KPrototypes(n_clusters=i, init='Cao', verbose=0)))
 
-        print "CALCULANDO EJECUCIONES K-MODES CAO"
+        print "CALCULANDO EJECUCIONES K-PROTOTYPES HUANG"
         errors = []
+        categorical = [0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 15, 16]
 
-        for i, k_modes in clusters:
+        for i, k_proto in clusters:
             print "CALCULANDO K =", i
-            labels = k_modes.fit_predict(X)
+            labels = k_proto.fit_predict(X, categorical=categorical)
 
-            print "\tError cuadratico:", k_modes.cost_
-            print "\t# iteraciones:", k_modes.n_iter_
-            errors.append(k_modes.cost_)
+            print "\tError cuadratico:", k_proto.cost_
+            print "\t# iteraciones:", k_proto.n_iter_
+            errors.append(k_proto.cost_)
+
             index_pos += 1
             self.plotCluster(C, labels, keys, "K = " + str(i), [2,4,index_pos])
         print "LISTO"

@@ -58,7 +58,7 @@ class Preprocess:
                       'ES AFILIADO A PAC O TIENE AFILIADO A UN FAMILIAR', 'CATEGORIA ESPECIFICA']
         """
 
-        erase_vars = ['ID', 'FECHA DE NACIMIENTO', 'SALARIO', 'SUELDO TEXTO', 'HORAS SEMANALES', 'HORAS DIARIAS', 'FIN', 'SALARIO A 240', 'PRIMERA ALTA','CARGO', 'FECHA EXPIRACION CONTRATO']#, 'TURNO','HORARIO TRABAJO']
+        erase_vars = ['ID', 'FECHA DE NACIMIENTO', 'FECHA INICIO POSESION', 'SALARIO', 'SUELDO TEXTO', 'HORAS SEMANALES', 'HORAS DIARIAS', 'FIN', 'SALARIO A 240', 'PRIMERA ALTA','CARGO', 'FECHA EXPIRACION CONTRATO']#, 'TURNO','HORARIO TRABAJO']
         print "Deleting variables tat we consider useless", erase_vars
         self.dataset.drop( erase_vars, axis=1, inplace=True )
 

@@ -10,20 +10,6 @@ class Kmeans(Cluster):
         self.dataset = _dataset.copy(deep=True)
         self.maxK = 9
 
-    def getRemovedDataset(self):
-        data = self.dataset.copy(deep=True)
-        erase_vars = [ 'FECHA INICIO POSESION', 'TURNO', 'HORAS AL MES', 'HORARIO TRABAJO',
-                      'GRUPO PERSONAL', 'CLASE DE CONTRATO', 'RELACION LABORAL', 'TIPO DE PACTO',
-                      'AREA DE NOMINA', 'CENTRO DE COSTE',
-                      'DIVISION', 'DIVISION PERSONAL', 'SUBDIVISION PERSONAL', 'AREA DE PERSONAL', 'SEXO',
-                      'ROL DEL EMPLEADO', 'TIPO DE PACTO ESPECIFICO', 'FAMILIAR AFILIADO A PAC',
-                      'ES AFILIADO A PAC O TIENE AFILIADO A UN FAMILIAR']
-
-        data = self.dataset.drop(erase_vars, axis=1)
-        data = data[[ 'EDAD DEL EMPLEADO', 'SALARIOS MINIMOS', 'AFILIADO A PAC', 'CATEGORIA ESPECIFICA', 'CATEGORIA']]
-
-        return data
-
     def daviesbouldin( self, X, labels, centroids ):
         nbre_of_clusters = len(centroids)  # Get the number of clusters
         distances = [[] for e in range(nbre_of_clusters)]  # Store intra-cluster distances by cluster
@@ -111,7 +97,7 @@ class Kmeans(Cluster):
             self.plotCluster(X, labels, keys, "K = " + str(len(centers)), [2,4,index_pos] )
         print "LISTO"
 
-        plt.show()
+        self.showPlot()
         file.close()
 
         print "GRAFICANDO INDICES"
@@ -122,12 +108,10 @@ class Kmeans(Cluster):
         plt.plot(k_X, sse_Y, '-o')
         plt.xlabel("# de clusters (k)")
         plt.ylabel("Suma de distancias cuadradas")
-        plt.savefig(folder + "Suma distancias.png")
-        plt.clf()
+        self.showPlot()
 
         plt.plot(k_X, db_Y, '-o')
         plt.xlabel("# de clusters (k)")
         plt.ylabel("Indice Davies-Bouldin")
-        plt.show()
-        plt.clf()
+        self.showPlot()
         print "LISTO"

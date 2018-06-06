@@ -13,6 +13,7 @@ from src.Preprocessing.Preprocessing import Preprocess
 from src.Preprocessing.Discretizing import Discretize
 from src.Association.Association import Association
 from src.Clustering.Kmodes import Kmodes
+from src.Clustering.Kprototypes import Kprototypes
 from src.Classifying.Runner import Runner
 
 import weka.core.jvm as jvm
@@ -87,6 +88,10 @@ class Main:
         #kmeans = Kmeans(self.dataset)
         #kmeans.run()
 
+        kprototypes = Kprototypes(self.dataset)
+        kprototypes.startClusteringKPrototypesHuang()
+        kprototypes.startClusteringKPrototypesCao()
+
         #Discretize
         discretize = Discretize( self.dataset, False )
         self.dataset = discretize.discretizeFile()
@@ -100,7 +105,7 @@ class Main:
         jvm.stop()
 
         kmodes = Kmodes(self.dataset)
-        # kmodes.startClusteringKModesFullDataHuang()
+        kmodes.startClusteringKModesFullDataHuang()
         kmodes.startClusteringKModesFullDataCao()
 
         # cluster.startClusteringKMeans()
