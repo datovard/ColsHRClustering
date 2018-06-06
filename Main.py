@@ -5,14 +5,20 @@ import seaborn as sns; sns.set()
 from sklearn.metrics import accuracy_score, confusion_matrix, auc
 from collections import OrderedDict
 
+from src.Preprocessing.Preprocessing import Preprocess
+from src.Preprocessing.Discretizing import Discretize
+
+from src.Clustering.Clustering import Cluster
+from src.Clustering.Kmeans import Kmeans
+from src.Clustering.Kmodes import Kmodes
+
 from src.Transformator import Transformator
 from src.Classifying.NaiveBayes import NaiveBayes
 from src.Classifying.DecisionTree import DecisionTree
 from src.Classifying.NeuralNetwork import NeuralNetwork
 from src.Classifying.SupportVectorMachine import SupportVectorMachine
 from src.Classifying.KNearest import KNearest
-from src.Preprocessing.Preprocessing import Preprocess
-from src.Preprocessing.Discretizing import Discretize
+
 
 class Main:
 
@@ -80,16 +86,17 @@ class Main:
         preprocess = Preprocess( self.dataset )
         self.dataset = preprocess.preprocessFile()
 
+        #kmeans = Kmeans(self.dataset)
+        #kmeans.run()
+
         #Discretize
         discretize = Discretize( self.dataset, False )
         self.dataset = discretize.discretizeFile()
 
+        kmodes = Kmodes(self.dataset)
+        #kmodes.startClusteringKModesFullDataHuang()
+        kmodes.startClusteringKModesFullDataCao()
 
-        #Classifying
-        self.runClassifiers()
-
-        #Cluster
-        # cluster = Cluster( self.dataset )
         # cluster.startClusteringKMeans()
 
         # cluster.startClusteringKModesFullDataHuang()
@@ -104,6 +111,9 @@ class Main:
         # cluster2 = Cluster(self.dataset)
         # cluster2.startClusteringKModesFullDataHuang()
         # cluster2.startClusteringKModesFullDataCao()
+
+        # Classifying
+        # self.runClassifiers()
 
         #PCA
         # pca = Pca( self.dataset )
