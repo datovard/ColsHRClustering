@@ -11,7 +11,7 @@ class Cluster:
     def __init__(self):
         self.startPlotCluster()
 
-    def startPlotCluster(self):
+    def startPlotCluster(self, ):
         self.fig = plt.figure(1)
 
     def plotCluster(self, data, labels, keys, title, subplot ):
@@ -46,3 +46,5 @@ class Cluster:
         plt.tight_layout()
         plt.show()
         plt.clf()
+        plt.cla()
+        plt.close()

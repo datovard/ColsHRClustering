@@ -33,16 +33,16 @@ class Main:
         #kprototypes.startClusteringKPrototypesHuang()
         #kprototypes.startClusteringKPrototypesCao()
 
-        dbscan = DBscan(self.dataset)
-        dbscan.run()
+        #dbscan = DBscan(self.dataset)
+        #dbscan.run()
 
         #Discretize
         discretize = Discretize( self.dataset, False )
         self.dataset = discretize.discretizeFile()
 
-        #kmodes = Kmodes(self.dataset)
-        #kmodes.startClusteringKModesFullDataHuang()
-        #kmodes.startClusteringKModesFullDataCao()
+        kmodes = Kmodes(self.dataset)
+        kmodes.startClusteringKModesFullDataHuang()
+        kmodes.startClusteringKModesFullDataCao()
 
         # Association
         '''association = Association(self.dataset)
